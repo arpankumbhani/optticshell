@@ -8,7 +8,7 @@ const UseToast = (
     position: "top-right",
     theme: "colored",
     style: {
-      zIndex: 100000,
+      zIndex: 10000,
       backgroundColor:
         type === "success" ? "#0066FF" : type === "error" ? "#af180d" : "",
     },

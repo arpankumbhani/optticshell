@@ -289,106 +289,90 @@ export default function ViewOpticorders() {
                             </div>
                         </div>
                     </div>
-                    <div className="overflow-x-auto border-t border-gray-200">
-                        <table className="min-w-full text-sm text-left">
-                            <thead className="bg-[#F9FAFB] text-gray-600 uppercase text-xs">
-                                <tr>
-                                    <th className="px-6 py-3 font-medium">Name</th>
-                                    <th className="px-6 py-3 font-medium">Color</th>
-                                    <th className="px-6 py-3 font-medium">Quantity</th>
-                                    <th className="px-6 py-3 font-medium">Price</th>
-                                    <th className="px-6 py-3 font-medium">Remark</th>
-                                    <th className="px-6 py-3 font-medium">Total Price</th>
-                                    <th className="px-6 py-3 font-medium">Modify Details</th>
-                                </tr>
-                            </thead>
+                    <div className="p-6">
 
-                            <tbody className="divide-y divide-gray-100 text-gray-700">
-                                {order?.order_models.map((item: OrderModel) => (
-                                    <tr key={item.id}>
-                                        <td className="px-6 py-3">{item.name}</td>
-                                        <td className="px-6 py-3">{item.color_name}</td>
-                                        <td className="px-6 py-3">{item.qty}</td>
-                                        <td className="px-6 py-3">{item.price}</td>
-                                        <td className="px-6 py-3">{item.remark || "-"}</td>
-                                        <td className="px-6 py-3">{item.total_price}</td>
+                        <div className="overflow-x-auto border rounded-xl border-gray-200">
+                            <table className="min-w-full rounded-xl text-sm text-left">
+                                <thead className="bg-[#F9FAFB] text-gray-600 uppercase text-xs">
+                                    <tr>
+                                        <th className="px-6 py-3 font-medium">Name</th>
+                                        <th className="px-6 py-3 font-medium">Color</th>
+                                        <th className="px-6 py-3 font-medium">Quantity</th>
+                                        <th className="px-6 py-3 font-medium">Price</th>
+                                        <th className="px-6 py-3 font-medium">Remark</th>
+                                        <th className="px-6 py-3 font-medium">Total Price</th>
+                                        <th className="px-6 py-3 font-medium">Modify Details</th>
+                                    </tr>
+                                </thead>
 
-                                        <td className="px-6 py-3">
-                                            {item.modify_details && item.modify_details.length > 0 ? (
-                                                <div className="flex flex-col gap-2">
-                                                    {item.modify_details.map((md, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="p-3 border rounded-lg bg-[#F9FAFB] shadow-sm"
-                                                        >
-                                                            <div className="text-xs flex gap-1">
-                                                                <span className="font-semibold text-gray-800">By:</span>
-                                                                <span>{md.modify_by}</span>
-                                                            </div>
+                                <tbody className="divide-y divide-gray-100 text-gray-700">
+                                    {order?.order_models.map((item: OrderModel) => (
+                                        <tr key={item.id}>
+                                            <td className="px-6 py-3">{item.name}</td>
+                                            <td className="px-6 py-3">{item.color_name}</td>
+                                            <td className="px-6 py-3">{item.qty}</td>
+                                            <td className="px-6 py-3">{item.price}</td>
+                                            <td className="px-6 py-3">{item.remark || "-"}</td>
+                                            <td className="px-6 py-3">{item.total_price}</td>
 
-                                                            <div className="text-xs flex gap-1">
-                                                                <span className="font-semibold text-gray-800">Date:</span>
-                                                                <span>{formatDateTime(md.modify_date)}</span>
-                                                            </div>
+                                            <td className="px-6 py-3 align-top">
+                                                {item.modify_details && item.modify_details.length > 0 ? (
+                                                    <div className="w-full rounded-lg bg-gray-50 p-3 shadow-sm">
 
-                                                            <div className="text-xs flex gap-1">
-                                                                <span className="font-semibold text-gray-800">Modify Qty:</span>
+                                                        <div className="grid grid-cols-4 text-xs font-semibold text-gray-600 pb-2 border-b">
+                                                            <span>By</span>
+                                                            <span>Date</span>
+                                                            <span>Modify Qty</span>
+                                                            <span>Prev Qty</span>
+                                                        </div>
+
+                                                        {item.modify_details.map((md, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className={`grid grid-cols-4 text-xs py-2 `}
+                                                            >
+                                                                <span className="text-gray-800">{md.modify_by}</span>
+
+                                                                <span className="text-gray-800">
+                                                                    {formatDateTime(md.modify_date)}
+                                                                </span>
+
                                                                 <span
-                                                                    className={
-                                                                        md.modify_qty < 0
+                                                                    className={`
+                                                                    ${md.modify_qty < 0
                                                                             ? "text-red-600"
                                                                             : md.modify_qty > 0
                                                                                 ? "text-green-600"
-                                                                                : "text-gray-700"
-                                                                    }
+                                                                                : "text-gray-800"
+                                                                        }`}
                                                                 >
                                                                     {md.modify_qty}
                                                                 </span>
-                                                            </div>
 
-                                                            <div className="text-xs flex gap-1">
-                                                                <span className="font-semibold text-gray-800">Prev Qty:</span>
-                                                                <span>{md.prev_qty}</span>
+                                                                <span className="text-gray-800">{md.prev_qty}</span>
                                                             </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <span className="text-gray-400 text-xs">No modifications</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-gray-400 text-xs">No modifications</span>
+                                                )}
+                                            </td>
+
+                                        </tr>
+                                    ))}
+                                    {order?.order_models.length === 0 && (
+                                        <tr>
+                                            <td colSpan={7} className="text-center py-4">
+                                                No order models found
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    {/* <div className="overflow-x-auto border-t border-gray-200">
-                        <table className="min-w-full text-sm text-left">
-                            <thead className="bg-[#F9FAFB] text-gray-600 uppercase text-xs">
-                                <tr>
-                                    <th className="px-6 py-3 font-medium">Name</th>
-                                    <th className="px-6 py-3 font-medium">Color</th>
-                                    <th className="px-6 py-3 font-medium">Quantity</th>
-                                    <th className="px-6 py-3 font-medium">Price</th>
-                                    <th className="px-6 py-3 font-medium">Remark</th>
-                                    <th className="px-6 py-3 font-medium">Total Price</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100 text-gray-700">
-                                {order?.order_models.map((item: OrderModel) => (
-                                    <tr key={item.id}>
-                                        <td className="px-6 py-3">{item.name}</td>
-                                        <td className="px-6 py-3">{item.color_name}</td>
-                                        <td className="px-6 py-3">{item.qty}</td>
-                                        <td className="px-6 py-3">{item.price}</td>
-                                        <td className="px-6 py-3">{item.remark || "-"}</td>
-                                        <td className="px-6 py-3">{item.total_price}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div> */}
+
                 </div>
             </div>
         </div>

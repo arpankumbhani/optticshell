@@ -92,7 +92,6 @@ export default function DeletedOpticordersList({
         <div className="p-6">
             <CommonTable
                 data={rows}
-                showCheckbox={false}
                 columns={columns}
                 pageIndex={pageIndex}
                 pageSize={pageSize}
@@ -102,6 +101,7 @@ export default function DeletedOpticordersList({
                 sortBy={sortBy}
                 sortOrder={sortOrder}
                 onSortChange={onSortChange}
+                showCheckbox={false}
             />
         </div>
     )

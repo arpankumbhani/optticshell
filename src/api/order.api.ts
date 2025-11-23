@@ -103,3 +103,55 @@ export const generatePdfAPI = async (
 
   return response as unknown as GeneratePdfResponse;
 };
+
+export const createAdminOrderAPI = async (payload: any): Promise<any> => {
+  const response = await request({
+    url: `order/createAdminOrder`,
+    method: "POST",
+    body: payload,
+  });
+
+  return response;
+};
+
+export const bulkDeleteOrdersAPI = async (payload: any): Promise<any> => {
+  const response = await request({
+    url: `order/bulkDeleteOrders`,
+    method: "POST",
+    body: payload,
+  });
+
+  return response;
+};
+
+export const updateAdminOrderAPI = async (
+  id: string,
+  payload: any
+): Promise<any> => {
+  const response = await request({
+    url: `order/updateAdminOrder/${id}`,
+    method: "PUT",
+    body: payload,
+  });
+
+  return response;
+};
+
+export const getDispatchDetailsAPI = async (id: string): Promise<any> => {
+  const response = await request({
+    url: `order/getDispatchDetails/${id}`,
+    method: "GET",
+  });
+
+  return response;
+};
+
+export const addDispatchDetailsAPI = async (payload: any): Promise<any> => {
+  const response = await request({
+    url: `order/addDispatchDetails`,
+    method: "POST",
+    body: payload,
+  });
+
+  return response;
+};

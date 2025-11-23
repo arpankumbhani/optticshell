@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import OpticordersList from "../../components/Opticorders/ViewOpticordersList";
 import { getAdminOrderListAPI } from "../../api/order.api";
-import type { Order, OrdersListResponse, OpticorderRow } from "../../Types/Order.type";
+import type { OrdersListResponse, OpticorderRow } from "../../Types/Order.type";
 import ViewOpticordersList from "../../components/Opticorders/ViewOpticordersList";
 
 export default function ViewOpticOrders() {

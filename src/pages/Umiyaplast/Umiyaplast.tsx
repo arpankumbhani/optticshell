@@ -1,24 +1,18 @@
 import { useState } from "react";
 import UserProfileTab from "../../components/Umiyaplast/UserProfileTab";
-import AdvancedTab from "../../components/Umiyaplast/AdvancedTab";
-import AccessTab from "../../components/Umiyaplast/AccessTab";
-import ActionsTab from "../../components/Umiyaplast/ActionsTab";
+import PasswordTab from "../../components/Umiyaplast/PasswordTab";
 
 export default function Umiyaplast() {
     const [activeTab, setActiveTab] = useState("User Profile");
 
-    const tabs = ["User Profile", "Advanced", "Access", "Actions"];
+    const tabs = ["User Profile", "Password"];
 
     const renderTabContent = () => {
         switch (activeTab) {
             case "User Profile":
                 return <UserProfileTab />;
-            case "Advanced":
-                return <AdvancedTab />;
-            case "Access":
-                return <AccessTab />;
-            case "Actions":
-                return <ActionsTab />;
+            case "Password":
+                return <PasswordTab />;
             default:
                 return null;
         }

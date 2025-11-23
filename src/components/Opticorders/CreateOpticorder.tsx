@@ -1,13 +1,15 @@
-import React, { useMemo, useEffect, useState } from "react";
+
+
+import { useMemo } from "react";
 import { useFormik, FieldArray, FormikProvider } from "formik";
 import * as Yup from "yup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProductListAPI } from "../../api/product.api";
-import { getOrderDetailsAPI, updateAdminOrderAPI } from "../../api/order.api";
+import { createAdminOrderAPI } from "../../api/order.api";
 import UseToast from "../../hooks/useToast";
 import { useAuthStore } from "../../store/authStore";
 import { convertFileToBase64 } from "../../helper/ImageTobase64";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type ProductColor = { id: string; color_name: string; price: number };
 type Product = {
@@ -24,80 +26,51 @@ const mapCategoryType = (mainCategory: string, subCategory?: string) => {
     return 1;
 };
 
-export default function EditOpticorder() {
-    const { id } = useParams<{ id: string }>();
+export default function CreateOpticorder() {
     const { user } = useAuthStore();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const { data: orderResp, isLoading: orderLoading } = useQuery({
-        queryKey: ["orderDetailsAPI", id],
-        queryFn: () => getOrderDetailsAPI(id!),
-        enabled: !!id,
-        staleTime: 0,
-    });
-
-    const updateMutation = useMutation({
-        mutationFn: (payload: any) => updateAdminOrderAPI(id!, payload),
-        onSuccess: (res: any) => {
-            UseToast(res?.message || "Order updated successfully", "success");
-            queryClient.invalidateQueries({ queryKey: ["ordersList"] });
-            queryClient.invalidateQueries({ queryKey: ["orderDetailsAPI", id] });
+    const createOrderMutation = useMutation({
+        mutationFn: createAdminOrderAPI,
+        onSuccess: (res) => {
+            UseToast(res?.message || "Order created successfully", "success");
+            formik.resetForm();
             navigate("/opticorders");
+            queryClient.invalidateQueries({ queryKey: ["ordersList"] });
         },
-        onError: (err: any) => {
-            console.error("Update Error:", err);
-            UseToast(err?.message || "Failed to update order", "error");
+        onError: (error) => {
+            console.error("Order Creation Error:", error);
+            formik.resetForm();
+            navigate("/opticorders");
+            UseToast(error?.message || "Failed to create order", "error");
         },
     });
-
-    const order = orderResp?.data || null;
-
-    const initialValues = useMemo(() => {
-        return {
-            orderNo: order?.order_number?.toString() || "",
-            status: order?.status?.toString() ?? "0",
-            billingContact: order?.billing_contact ?? "",
-            mainCategory: order?.main_category === "Print Order" ? "2" : "1",
-            subCategory:
-                order?.sub_category === "Foil Print Order"
-                    ? "2"
-                    : order?.sub_category === "One Color Ink Print Order"
-                        ? "3"
-                        : order?.sub_category === "Two Color Ink Print Order"
-                            ? "4"
-                            : "",
-            orderType: order?.order_type?.toString() ?? "",
-            subCustomerDetail: order?.sub_customer_detail ?? "",
-            subCustomerName: order?.sub_customer_name ?? "",
-            orderRemark: order?.order_remark ?? "",
-            orderImage: null as File | null,
-            models:
-                (order?.order_models || []).map((m: any) => ({
-                    _id: m.id,
-                    productId: m.product_id || "",
-                    colorId: m.product_color_id || "",
-                    qty: Number(m.qty || 0),
-                    price: Number(m.price || 0),
-                    remark: m.remark || "",
-                    total: Number(m.total_price ?? m.qty * m.price),
-                })) || [
-                    {
-                        _id: undefined,
-                        productId: "",
-                        colorId: "",
-                        qty: 0,
-                        price: 0,
-                        remark: "",
-                        total: 0,
-                    },
-                ],
-        };
-    }, [order]);
 
     const formik = useFormik({
-        initialValues: initialValues,
-        enableReinitialize: true,
+        initialValues: {
+            orderNo: "",
+            status: "0",
+            billingContact: "",
+            mainCategory: "1",
+            subCategory: "",
+            orderType: "",
+            subCustomerDetail: "",
+            subCustomerName: "",
+            orderRemark: "",
+            orderImage: null as File | null,
+            models: [
+                {
+                    productId: "",
+                    colorId: "",
+                    qty: 0,
+                    price: 0,
+                    remark: "",
+                    total: 0,
+                },
+            ],
+        },
+
         validationSchema: Yup.object().shape({
             billingContact: Yup.string().required("Billing contact is required"),
             mainCategory: Yup.string().required("Main Category is required"),
@@ -129,39 +102,38 @@ export default function EditOpticorder() {
         }),
 
         onSubmit: async (values) => {
-            try {
-                const user_id = user?.id;
+            const user_id = user?.id;
 
-                const category_type =
-                    values.mainCategory === "1" ? 1 : Number(values.subCategory);
+            const category_type =
+                values.mainCategory === "1"
+                    ? 1
+                    : Number(values.subCategory);
 
-                const base64Image = await convertFileToBase64(values.orderImage);
 
-                const payload = {
-                    user_id: user_id,
-                    order_status: Number(values.status),
-                    category_type: category_type,
-                    order_type: Number(values.orderType || 0),
-                    sub_customer_name: values.subCustomerName,
-                    sub_customer_detail: values.subCustomerDetail,
-                    order_remark: values.orderRemark,
+            const base64Image = await convertFileToBase64(values.orderImage);
 
-                    order_image: base64Image,
+            const payload = {
+                user_id: user_id,
+                order_status: Number(values.status),
+                category_type: category_type,
+                order_type: Number(values.orderType || 0),
+                sub_customer_name: values.subCustomerName,
+                sub_customer_detail: values.subCustomerDetail,
+                order_remark: values.orderRemark,
 
-                    order_models: values.models.map((m: any) => ({
-                        product_id: m.productId,
-                        product_color_id: m.colorId,
-                        quantity: m.qty,
-                        price: m.price,
-                        remark: m.remark,
-                    })),
-                };
+                order_image: base64Image,
 
-                updateMutation.mutate(payload);
-            } catch (err) {
-                console.error("Submit error", err);
-                UseToast("Failed to submit", "error");
-            }
+                order_models: values.models.map((m) => ({
+                    product_id: m.productId,
+                    product_color_id: m.colorId,
+                    quantity: m.qty,
+                    price: m.price,
+                    remark: m.remark,
+                })),
+            };
+            console.log("Submit payload:", payload);
+            createOrderMutation.mutate(payload);
+
         },
     });
 
@@ -180,23 +152,6 @@ export default function EditOpticorder() {
 
     const products: Product[] = productResp?.data?.productList || [];
     const findProduct = (id?: string) => products.find((p) => p.id === id);
-
-    useEffect(() => {
-        values.models.forEach((m: any, idx: number) => {
-            if (m.productId && m.colorId) {
-                const prod = findProduct(m.productId);
-                const color = prod?.productColors?.find((c) => c.id === m.colorId);
-                const price = color?.price ?? m.price ?? 0;
-                const qty = Number(m.qty || 0);
-                if (Number(m.price) !== Number(price)) {
-                    setFieldValue(`models[${idx}].price`, price);
-                }
-                if (Number(m.total) !== Number(qty * price)) {
-                    setFieldValue(`models[${idx}].total`, qty * price);
-                }
-            }
-        });
-    }, [products]);
 
     const onModelChange = (index: number, field: string, value: any) => {
         setFieldValue(`models[${index}].${field}`, value);
@@ -227,8 +182,8 @@ export default function EditOpticorder() {
     };
 
     const totals = useMemo(() => {
-        const totalPrice = values.models.reduce((s: number, m: any) => s + Number(m.total || 0), 0);
-        const totalQty = values.models.reduce((s: number, m: any) => s + Number(m.qty || 0), 0);
+        const totalPrice = values.models.reduce((s, m) => s + Number(m.total || 0), 0);
+        const totalQty = values.models.reduce((s, m) => s + Number(m.qty || 0), 0);
         return { totalPendingPrice: totalPrice, totalPrice, totalPendingQty: totalQty, totalQty };
     }, [values.models]);
 
@@ -236,17 +191,9 @@ export default function EditOpticorder() {
     const isPrint = values.mainCategory === "2";
     const orderImageEnabled = isPrint && (values.orderType === "2" || values.orderType === "3");
 
-    const [existingImagePreview, setExistingImagePreview] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (order?.order_image) {
-            setExistingImagePreview(order.order_image);
-        }
-    }, [order]);
-
     return (
         <div className="p-6 bg-white rounded-md shadow-sm max-w-5xl mx-auto">
-            <h1 className="text-xl font-semibold mb-4">Edit Optic Order</h1>
+            <h1 className="text-xl font-semibold mb-4">Create Opttic Order</h1>
 
             <form onSubmit={formik.handleSubmit} className="space-y-6">
                 <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
@@ -254,6 +201,18 @@ export default function EditOpticorder() {
                 </h2>
                 <div className="pl-5">
                     <div className="grid grid-cols-2 gap-4 items-end">
+                        {/* <div className="col-span-1">
+                            <label className="text-[#131927] font-medium text-sm">Order No</label>
+                            <input
+                                name="orderNo"
+                                value={values.orderNo}
+                                onChange={formik.handleChange}
+                                className="mmt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                            />
+                            {touched.orderNo && errors.orderNo && (
+                                <div className="text-xs text-red-500 mt-1">{errors.orderNo as string}</div>
+                            )}
+                        </div> */}
                         <div className="col-span-1">
                             <label className="text-[#131927] font-medium text-sm">Status</label>
                             <select
@@ -408,12 +367,6 @@ export default function EditOpticorder() {
                                 disabled={!orderImageEnabled}
                                 className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
                             />
-                            {existingImagePreview && !values.orderImage && (
-                                <div className="mt-2">
-                                    <div className="text-xs text-gray-500">Existing image preview</div>
-                                    <img src={existingImagePreview} alt="order" className="h-24 mt-1 object-contain" />
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -499,7 +452,10 @@ export default function EditOpticorder() {
                                                         name={`models[${idx}].remark`}
                                                         value={model.remark}
                                                         onChange={(e) =>
-                                                            setFieldValue(`models[${idx}].remark`, e.target.value)
+                                                            setFieldValue(
+                                                                `models[${idx}].remark`,
+                                                                e.target.value
+                                                            )
                                                         }
                                                         className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
                                                     />
@@ -583,19 +539,28 @@ export default function EditOpticorder() {
                 <div className="flex gap-3 justify-end">
                     <button
                         type="submit"
-                        disabled={updateMutation.isPending}
+                        disabled={createOrderMutation.isPending}
                         className="border px-6 py-2 bg-blue-50 cursor-pointer  rounded text-blue-600 hover:bg-blue-600 disabled:bg-blue-400 hover:text-white"
                     >
-                        {updateMutation.isPending ? "Submitting..." : "Update Order"}
+                        {createOrderMutation.isPending ? "Submitting..." : "Create Order"}
                     </button>
+
 
                     <button
                         type="button"
-                        disabled={updateMutation.isPending}
+                        disabled={createOrderMutation.isPending}
                         onClick={() => navigate("/opticorders")}
                         className="border px-4 py-2 rounded bg-red-50 cursor-pointer text-red-600 hover:bg-red-600 hover:text-white"
                     >
                         Cancel
+                    </button>
+                    <button
+                        type="button"
+                        disabled={createOrderMutation.isPending}
+                        onClick={() => formik.resetForm()}
+                        className="border px-4 py-2 rounded cursor-pointer"
+                    >
+                        Reset
                     </button>
                 </div>
 

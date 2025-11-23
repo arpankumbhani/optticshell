@@ -18,9 +18,10 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { icon: <OpticOrders />, name: "Create OpticOrders", path: "/create-opticorders" },
-  { icon: <OpticOrders />, name: "Optitcorders", path: "/opticorders" },
+  // { icon: <OpticOrders />, name: "Optitcorders", path: "/opticorders" },
   { icon: <ViewOpticOrders />, name: "View OpticOrders", path: "/view-opticorders" },
   { icon: <DeletedOrder />, name: "Deleted Order", path: "/deleted-order" },
+  { icon: <DeletedOrder />, name: "Deleted Request User", path: "/deleted-request-user" },
 ];
 
 const listItems: NavItem[] = [

@@ -1,11 +1,11 @@
-import type { ColumnDef } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
 import CommonTable, { type CustomColumnDef } from "../../common/CommonTable";
 import type { OpticorderRow } from "../../Types/Order.type";
 import { formatDate } from "../../helper/DateFormate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import UseToast from "../../hooks/useToast";
-import { generatePdfAPI } from "../../api/order.api";
+import { bulkDeleteOrdersAPI, generatePdfAPI } from "../../api/order.api";
+import { useState } from "react";
 
 interface OpticordersListProps {
     rows: OpticorderRow[];
@@ -32,6 +32,8 @@ export default function ViewOpticordersList({
     onSortChange,
 }: OpticordersListProps) {
     const navigate = useNavigate();
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    console.log("🚀 ~ ViewOpticordersList ~ selectedIds:", selectedIds)
 
     const handleViewOrder = (id: string) => {
         navigate(`/view-opticorders/${id}`);
@@ -51,7 +53,7 @@ export default function ViewOpticordersList({
                 link.click();
                 link.remove();
                 UseToast(res?.message || "Order PDF generated successfully", "success");
-                queryClient.invalidateQueries({ queryKey: ["getOpticorderListAPI"] });
+                queryClient.invalidateQueries({ queryKey: ["getAdminOrderListAPI"] });
             }
         },
         onError: (error: any) => {
@@ -60,8 +62,29 @@ export default function ViewOpticordersList({
         }
     });
 
+    const bulkDeleteOrdersMutation = useMutation({
+        mutationFn: (payload: any) => bulkDeleteOrdersAPI(payload),
+        onSuccess: (res) => {
+            UseToast(res?.message || "Orders deleted successfully", "success");
+            queryClient.invalidateQueries({ queryKey: ["getAdminOrderListAPI"] });
+        },
+        onError: (error: any) => {
+            console.error("Failed to delete orders:", error);
+            UseToast(error?.message || "Failed to delete orders", "error");
+        }
+    });
+
     const handlePrint = (orderId: string) => {
         generatePdfMutation.mutate(orderId);
+    };
+
+
+
+    const handleDeleteSelected = (ids: string[]) => {
+        const payload: any = {
+            order_ids: ids
+        }
+        bulkDeleteOrdersMutation.mutate(payload);
     };
 
     const columns: CustomColumnDef<OpticorderRow>[] = [
@@ -113,6 +136,9 @@ export default function ViewOpticordersList({
                 sortBy={sortBy}
                 sortOrder={sortOrder}
                 onSortChange={onSortChange}
+                onSelectionChange={(ids) => setSelectedIds(ids)}
+                idAccessor={(row) => row.id}
+                showDeleteButton={true} onDeleteSelected={handleDeleteSelected}
             />
         </div>
     );
