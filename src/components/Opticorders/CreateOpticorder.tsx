@@ -7,9 +7,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProductListAPI } from "../../api/product.api";
 import { createAdminOrderAPI } from "../../api/order.api";
 import UseToast from "../../hooks/useToast";
-import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { getUsersForOrderDropdown } from "../../api/users.api";
+import { ChevronLeft } from "lucide-react";
+
 
 type ProductColor = { id: string; color_name: string; price: number };
 type Product = {
@@ -27,7 +28,6 @@ const mapCategoryType = (mainCategory: string, subCategory?: string) => {
 };
 
 export default function CreateOpticorder() {
-    const { user } = useAuthStore();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -114,32 +114,7 @@ export default function CreateOpticorder() {
                 values.mainCategory === "1"
                     ? 1
                     : Number(values.subCategory);
-
-
-            // const base64Image = await convertFileToBase64(values.orderImage);
-
-            // const payload = {
-            //     user_id: values.billingContactId,
-            //     order_status: Number(values.status),
-            //     category_type: category_type,
-            //     order_type: Number(values.orderType || 0),
-            //     sub_customer_name: values.subCustomerName,
-            //     sub_customer_detail: values.subCustomerDetail,
-            //     order_remark: values.orderRemark,
-
-            //     order_image: values.orderImage,
-
-            //     order_models: values.models.map((m) => ({
-            //         product_id: m.productId,
-            //         product_color_id: m.colorId,
-            //         quantity: m.qty,
-            //         price: m.price,
-            //         remark: m.remark,
-            //     })),
-            // };
-            // console.log("Submit payload:", payload);
             const formData = new FormData();
-
             formData.append("user_id", values.billingContactId);
             formData.append("order_status", values.status);
             formData.append("category_type", category_type);
@@ -147,13 +122,9 @@ export default function CreateOpticorder() {
             formData.append("sub_customer_name", values.subCustomerName || "");
             formData.append("sub_customer_detail", values.subCustomerDetail || "");
             formData.append("order_remark", values.orderRemark || "");
-
-            // Image (File only)
             if (values.orderImage instanceof File) {
                 formData.append("order_image", values.orderImage);
             }
-
-            // Models (array)
             values.models.forEach((m: any, index: number) => {
                 formData.append(`order_models[${index}][product_id]`, m.productId);
                 formData.append(`order_models[${index}][product_color_id]`, m.colorId);
@@ -162,7 +133,6 @@ export default function CreateOpticorder() {
                 formData.append(`order_models[${index}][remark]`, m.remark || "");
             });
             createOrderMutation.mutate(formData);
-
         },
     });
 
@@ -221,409 +191,389 @@ export default function CreateOpticorder() {
     const orderImageEnabled = isPrint && (values.orderType === "2" || values.orderType === "3");
 
     return (
-        <>
-            <div className="p-4 ml-2">
-                <div className="text-[#191B1C] font-medium py-2">Create Opttic Order</div>
-                <div className="p-6 bg-white rounded-md shadow-sm mx-auto">
-                    <form onSubmit={formik.handleSubmit} className="space-y-6">
-                        <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
-                            BASIC
-                        </h2>
-                        <div className="pl-5">
-                            <div className="grid grid-cols-2 gap-4 items-end">
-                                {/* <div className="col-span-1">
-                            <label className="text-[#131927] font-medium text-sm">Order No</label>
-                            <input
-                                name="orderNo"
-                                value={values.orderNo}
-                                onChange={formik.handleChange}
-                                className="mmt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                            />
-                            {touched.orderNo && errors.orderNo && (
-                                <div className="text-xs text-red-500 mt-1">{errors.orderNo as string}</div>
-                            )}
-                        </div> */}
-                                <div className="col-span-1">
-                                    <label className="text-[#131927] font-medium text-sm">Status</label>
-                                    <select
-                                        name="status"
-                                        value={values.status}
-                                        onChange={formik.handleChange}
-                                        className="mmt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                    >
-                                        <option value="0">Pending</option>
-                                        <option value="1">Partial Dispatch</option>
-                                        <option value="2">Dispatch</option>
-                                        <option value="3">Cancelled</option>
-                                    </select>
-                                </div>
+        <div className="p-4 ml-2">
+            <button onClick={() => navigate(-1)} className="flex items-center gap-1 border border-[#0E5FD9] text-[#0E5FD9] rounded-full px-2 cursor-pointer hover:text-[#0037ff] hover:border-[#0037ff]">
+                <ChevronLeft className="w-5 h-5" />
+                <span className="mb-1"> Go Back</span>
+            </button>
+            <div className="text-[#191B1C] font-medium text-lg py-2">Create Opttic Order</div>
+            <div className="p-6 bg-white rounded-md shadow-sm mx-auto">
+                <form onSubmit={formik.handleSubmit} className="space-y-6">
+                    <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
+                        BASIC
+                    </h2>
+                    <div className="pl-5">
+                        <div className="grid grid-cols-2 gap-4 items-end">
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Status</label>
+                                <select
+                                    name="status"
+                                    value={values.status}
+                                    onChange={formik.handleChange}
+                                    className="mmt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                >
+                                    <option value="0">Pending</option>
+                                    <option value="1">Partial Dispatch</option>
+                                    <option value="2">Dispatch</option>
+                                    <option value="3">Cancelled</option>
+                                </select>
+                            </div>
 
-                                <div className="col-span-1">
-                                    {/* <label className="text-[#131927] font-medium text-sm">Billing Contact</label>
-                            <input
-                                name="billingContact"
-                                value={values.billingContact}
-                                onChange={formik.handleChange}
-                                className="mmt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                            />
-                            {touched.billingContact && errors.billingContact && (
-                                <div className="text-xs text-red-500 mt-1">{errors.billingContact as string}</div>
-                            )} */}
-                                    <label className="text-[#131927] font-medium text-sm">Billing Contact</label>
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Billing Contact</label>
 
-                                    <select
-                                        name="billingContactId"
-                                        value={values?.billingContactId}
-                                        onChange={(e) => {
-                                            const selectedUser = users?.find((u: any) => u.id === e.target.value);
-                                            setFieldValue("billingContactId", selectedUser?.id || "");
-                                            setFieldValue("billingContact", selectedUser?.name || "");
-                                            setFieldValue("billingEmail", selectedUser?.email || "");
-                                        }}
-                                        className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                    >
-                                        <option value="">Select Billing Contact</option>
+                                <select
+                                    name="billingContactId"
+                                    value={values?.billingContactId}
+                                    onChange={(e) => {
+                                        const selectedUser = users?.find((u: any) => u.id === e.target.value);
+                                        setFieldValue("billingContactId", selectedUser?.id || "");
+                                        setFieldValue("billingContact", selectedUser?.name || "");
+                                        setFieldValue("billingEmail", selectedUser?.email || "");
+                                    }}
+                                    className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                >
+                                    <option value="">Select Billing Contact</option>
 
-                                        {users?.map((user: any) => (
-                                            <option key={user.id} value={user.id}>
-                                                {user.name} ({user.email})
-                                            </option>
-                                        ))}
-                                    </select>
+                                    {users?.map((user: any) => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.name} ({user.email})
+                                        </option>
+                                    ))}
+                                </select>
 
-                                    {touched.billingContact && errors.billingContact && (
-                                        <div className="text-xs text-red-500 mt-1">
-                                            {errors.billingContact as string}
-                                        </div>
-                                    )}
-                                </div>
+                                {touched.billingContact && errors.billingContact && (
+                                    <div className="text-xs text-red-500 mt-1">
+                                        {errors.billingContact as string}
+                                    </div>
+                                )}
                             </div>
                         </div>
+                    </div>
 
-                        <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
-                            NEW PANEL 1
-                        </h2>
-                        <div className="pl-5">
+                    <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
+                        NEW PANEL 1
+                    </h2>
+                    <div className="pl-5">
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="col-span-1">
-                                    <label className="text-[#131927] font-medium text-sm">Main Category</label>
-                                    <select
-                                        name="mainCategory"
-                                        value={values.mainCategory}
-                                        className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            setFieldValue("mainCategory", val);
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Main Category</label>
+                                <select
+                                    name="mainCategory"
+                                    value={values.mainCategory}
+                                    className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setFieldValue("mainCategory", val);
 
-                                            if (val === "1") {
-                                                setFieldValue("subCategory", "");
-                                                setFieldValue("orderType", "");
-                                                setFieldValue("subCustomerDetail", "");
-                                                setFieldValue("subCustomerName", "");
-                                                setFieldValue("orderImage", null);
-                                                setFieldTouched("subCategory", false);
-                                                setFieldTouched("orderType", false);
-                                            }
-                                        }}
-                                    >
-                                        <option value="1">Plain Order</option>
-                                        <option value="2">Print Order</option>
-                                    </select>
-                                    {errors.mainCategory && (
-                                        <div className="text-xs text-red-500 mt-1">{errors.mainCategory as string}</div>
-                                    )}
-                                </div>
+                                        if (val === "1") {
+                                            setFieldValue("subCategory", "");
+                                            setFieldValue("orderType", "");
+                                            setFieldValue("subCustomerDetail", "");
+                                            setFieldValue("subCustomerName", "");
+                                            setFieldValue("orderImage", null);
+                                            setFieldTouched("subCategory", false);
+                                            setFieldTouched("orderType", false);
+                                        }
+                                    }}
+                                >
+                                    <option value="1">Plain Order</option>
+                                    <option value="2">Print Order</option>
+                                </select>
+                                {errors.mainCategory && (
+                                    <div className="text-xs text-red-500 mt-1">{errors.mainCategory as string}</div>
+                                )}
+                            </div>
 
-                                <div className="col-span-1">
-                                    <label className="text-[#131927] font-medium text-sm">Sub Category</label>
-                                    <select
-                                        name="subCategory"
-                                        value={values.subCategory}
-                                        onChange={(e) => setFieldValue("subCategory", e.target.value)}
-                                        disabled={isPlain}
-                                        className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                                    >
-                                        <option value="">Select Sub Category</option>
-                                        <option value="2">Foil Print Order</option>
-                                        <option value="3">One Color Ink Print Order</option>
-                                        <option value="4">Two Color Ink Print Order</option>
-                                    </select>
-                                    {errors.subCategory && isPrint && (
-                                        <div className="text-xs text-red-500 mt-1">{errors.subCategory as string}</div>
-                                    )}
-                                </div>
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Sub Category</label>
+                                <select
+                                    name="subCategory"
+                                    value={values.subCategory}
+                                    onChange={(e) => setFieldValue("subCategory", e.target.value)}
+                                    disabled={isPlain}
+                                    className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <option value="">Select Sub Category</option>
+                                    <option value="2">Foil Print Order</option>
+                                    <option value="3">One Color Ink Print Order</option>
+                                    <option value="4">Two Color Ink Print Order</option>
+                                </select>
+                                {errors.subCategory && isPrint && (
+                                    <div className="text-xs text-red-500 mt-1">{errors.subCategory as string}</div>
+                                )}
+                            </div>
 
-                                <div className="col-span-1">
-                                    <label className="text-[#131927] font-medium text-sm">Order Type</label>
-                                    <select
-                                        name="orderType"
-                                        value={values.orderType}
-                                        onChange={(e) => {
-                                            setFieldValue("orderType", e.target.value);
-                                            if (!(e.target.value === "2" || e.target.value === "3")) {
-                                                setFieldValue("orderImage", null);
-                                            }
-                                        }}
-                                        disabled={isPlain}
-                                        className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                                    >
-                                        <option value="">Select Order Type</option>
-                                        <option value="1">Old Block</option>
-                                        <option value="2">New Block</option>
-                                        <option value="3">Correction Old Block</option>
-                                    </select>
-                                    {errors.orderType && isPrint && (
-                                        <div className="text-xs text-red-500 mt-1">{errors.orderType as string}</div>
-                                    )}
-                                </div>
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Order Type</label>
+                                <select
+                                    name="orderType"
+                                    value={values.orderType}
+                                    onChange={(e) => {
+                                        setFieldValue("orderType", e.target.value);
+                                        if (!(e.target.value === "2" || e.target.value === "3")) {
+                                            setFieldValue("orderImage", null);
+                                        }
+                                    }}
+                                    disabled={isPlain}
+                                    className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <option value="">Select Order Type</option>
+                                    <option value="1">Old Block</option>
+                                    <option value="2">New Block</option>
+                                    <option value="3">Correction Old Block</option>
+                                </select>
+                                {errors.orderType && isPrint && (
+                                    <div className="text-xs text-red-500 mt-1">{errors.orderType as string}</div>
+                                )}
+                            </div>
 
-                                <div className="col-span-1">
-                                    <label className="text-[#131927] font-medium text-sm">Sub Customer Detail</label>
-                                    <input
-                                        name="subCustomerDetail"
-                                        value={values.subCustomerDetail}
-                                        onChange={formik.handleChange}
-                                        disabled={isPlain}
-                                        className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                                    />
-                                </div>
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Sub Customer Detail</label>
+                                <input
+                                    name="subCustomerDetail"
+                                    value={values.subCustomerDetail}
+                                    onChange={formik.handleChange}
+                                    disabled={isPlain}
+                                    className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                />
+                            </div>
 
-                                <div className="col-span-1">
-                                    <label className="text-[#131927] font-medium text-sm">Sub Customer Name</label>
-                                    <input
-                                        name="subCustomerName"
-                                        value={values.subCustomerName}
-                                        onChange={formik.handleChange}
-                                        disabled={isPlain}
-                                        className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                                        placeholder="Sub customer name"
-                                    />
-                                </div>
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Sub Customer Name</label>
+                                <input
+                                    name="subCustomerName"
+                                    value={values.subCustomerName}
+                                    onChange={formik.handleChange}
+                                    disabled={isPlain}
+                                    className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                    placeholder="Sub customer name"
+                                />
+                            </div>
 
-                                <div className="col-span-1">
-                                    <label className="text-[#131927] font-medium text-sm">Order Remark</label>
-                                    <input
-                                        name="orderRemark"
-                                        value={values.orderRemark}
-                                        onChange={formik.handleChange}
-                                        className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                        placeholder="Order remark"
-                                    />
-                                </div>
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Order Remark</label>
+                                <input
+                                    name="orderRemark"
+                                    value={values.orderRemark}
+                                    onChange={formik.handleChange}
+                                    className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                    placeholder="Order remark"
+                                />
+                            </div>
 
-                                <div className="col-span-1">
-                                    <label className="text-[#131927] font-medium text-sm">Order Image</label>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            const f = e.target.files?.[0] ?? null;
-                                            setFieldValue("orderImage", f);
-                                        }}
-                                        disabled={!orderImageEnabled}
-                                        className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                                    />
-                                </div>
+                            <div className="col-span-1">
+                                <label className="text-[#131927] font-medium text-sm">Order Image</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const f = e.target.files?.[0] ?? null;
+                                        setFieldValue("orderImage", f);
+                                    }}
+                                    disabled={!orderImageEnabled}
+                                    className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                />
                             </div>
                         </div>
-                        <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
-                            NEW PANEL 1
-                        </h2>
-                        <div className="pl-5">
-                            <FormikProvider value={formik}>
-                                <FieldArray
-                                    name="models"
-                                    render={(arrayHelpers) => (
-                                        <div className="rounded p-3 bg-[#F9FAFB]">
-                                            {(values.models || []).map((model: any, idx: number) => (
-                                                <div key={idx} className="mb-4">
-                                                    <div className="grid grid-cols-13 gap-3 items-end">
-                                                        <div className="col-span-3">
-                                                            <label className="text-[#131927] font-medium text-sm">Name</label>
-                                                            <select
-                                                                name={`models[${idx}].productId`}
-                                                                value={model.productId}
-                                                                onChange={(e) =>
-                                                                    onModelChange(idx, "productId", e.target.value)
-                                                                }
-                                                                className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                                            >
-                                                                <option value="">Select product</option>
-                                                                {products.map((p) => (
-                                                                    <option key={p.id} value={p.id}>
-                                                                        {p.name}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
+                    </div>
+                    <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
+                        NEW PANEL 1
+                    </h2>
+                    <div className="pl-5">
+                        <FormikProvider value={formik}>
+                            <FieldArray
+                                name="models"
+                                render={(arrayHelpers) => (
+                                    <div className="rounded p-3 bg-[#F9FAFB]">
+                                        {(values.models || []).map((model: any, idx: number) => (
+                                            <div key={idx} className="mb-4">
+                                                <div className="grid grid-cols-13 gap-3 items-end">
+                                                    <div className="col-span-3">
+                                                        <label className="text-[#131927] font-medium text-sm">Name</label>
+                                                        <select
+                                                            name={`models[${idx}].productId`}
+                                                            value={model.productId}
+                                                            onChange={(e) =>
+                                                                onModelChange(idx, "productId", e.target.value)
+                                                            }
+                                                            className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                                        >
+                                                            <option value="">Select product</option>
+                                                            {products.map((p) => (
+                                                                <option key={p.id} value={p.id}>
+                                                                    {p.name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
 
-                                                        <div className="col-span-2">
-                                                            <label className="text-[#131927] font-medium text-sm">Color</label>
-                                                            <select
-                                                                name={`models[${idx}].colorId`}
-                                                                value={model.colorId}
-                                                                onChange={(e) =>
-                                                                    onModelChange(idx, "colorId", e.target.value)
-                                                                }
-                                                                disabled={!model.productId}
-                                                                className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                                            >
-                                                                <option value="">Select color</option>
-                                                                {findProduct(model.productId)?.productColors?.map((c) => (
-                                                                    <option key={c.id} value={c.id}>
-                                                                        {c.color_name}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
+                                                    <div className="col-span-2">
+                                                        <label className="text-[#131927] font-medium text-sm">Color</label>
+                                                        <select
+                                                            name={`models[${idx}].colorId`}
+                                                            value={model.colorId}
+                                                            onChange={(e) =>
+                                                                onModelChange(idx, "colorId", e.target.value)
+                                                            }
+                                                            disabled={!model.productId}
+                                                            className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                                        >
+                                                            <option value="">Select color</option>
+                                                            {findProduct(model.productId)?.productColors?.map((c) => (
+                                                                <option key={c.id} value={c.id}>
+                                                                    {c.color_name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
 
-                                                        <div className="col-span-2">
-                                                            <label className="text-[#131927] font-medium text-sm">Qty</label>
-                                                            <input
-                                                                type="number"
-                                                                min={0}
-                                                                name={`models[${idx}].qty`}
-                                                                value={model.qty}
-                                                                onChange={(e) =>
-                                                                    onModelChange(idx, "qty", Number(e.target.value))
-                                                                }
-                                                                className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                                            />
-                                                        </div>
+                                                    <div className="col-span-2">
+                                                        <label className="text-[#131927] font-medium text-sm">Qty</label>
+                                                        <input
+                                                            type="number"
+                                                            min={0}
+                                                            name={`models[${idx}].qty`}
+                                                            value={model.qty}
+                                                            onChange={(e) =>
+                                                                onModelChange(idx, "qty", Number(e.target.value))
+                                                            }
+                                                            className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                                        />
+                                                    </div>
 
-                                                        <div className="col-span-2">
-                                                            <label className="text-[#131927] font-medium text-sm">Price</label>
-                                                            <input
-                                                                type="number"
-                                                                name={`models[${idx}].price`}
-                                                                value={model.price}
-                                                                disabled
-                                                                className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 cursor-not-allowed"
-                                                            />
-                                                        </div>
+                                                    <div className="col-span-2">
+                                                        <label className="text-[#131927] font-medium text-sm">Price</label>
+                                                        <input
+                                                            type="number"
+                                                            name={`models[${idx}].price`}
+                                                            value={model.price}
+                                                            disabled
+                                                            className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm disabled:opacity-40 cursor-not-allowed"
+                                                        />
+                                                    </div>
 
-                                                        <div className="col-span-2">
-                                                            <label className="text-[#131927] font-medium text-sm">Remark</label>
-                                                            <input
-                                                                name={`models[${idx}].remark`}
-                                                                value={model.remark}
-                                                                onChange={(e) =>
-                                                                    setFieldValue(
-                                                                        `models[${idx}].remark`,
-                                                                        e.target.value
-                                                                    )
-                                                                }
-                                                                className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                                            />
-                                                        </div>
+                                                    <div className="col-span-2">
+                                                        <label className="text-[#131927] font-medium text-sm">Remark</label>
+                                                        <input
+                                                            name={`models[${idx}].remark`}
+                                                            value={model.remark}
+                                                            onChange={(e) =>
+                                                                setFieldValue(
+                                                                    `models[${idx}].remark`,
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                            className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                                        />
+                                                    </div>
 
-                                                        <div className="col-span-1">
-                                                            <label className="text-[#131927] font-medium text-sm">Total</label>
-                                                            <input
-                                                                name={`models[${idx}].total`}
-                                                                value={model.total}
-                                                                readOnly
-                                                                className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
-                                                            />
-                                                        </div>
+                                                    <div className="col-span-1">
+                                                        <label className="text-[#131927] font-medium text-sm">Total</label>
+                                                        <input
+                                                            name={`models[${idx}].total`}
+                                                            value={model.total}
+                                                            readOnly
+                                                            className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                                                        />
+                                                    </div>
 
-                                                        <div className="col-span-1 mb-1">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => arrayHelpers.remove(idx)}
-                                                                disabled={values.models.length === 1}
-                                                                className="px-3 py-1 text-sm border rounded bg-red-50 cursor-pointer text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                            >
-                                                                Delete
-                                                            </button>
-                                                        </div>
+                                                    <div className="col-span-1 mb-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => arrayHelpers.remove(idx)}
+                                                            disabled={values.models.length === 1}
+                                                            className="px-3 py-1 text-sm border rounded bg-red-50 cursor-pointer text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        >
+                                                            Delete
+                                                        </button>
                                                     </div>
                                                 </div>
-                                            ))}
-
-                                            <div className="flex justify-end mt-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        arrayHelpers.push({
-                                                            productId: "",
-                                                            colorId: "",
-                                                            qty: 0,
-                                                            price: 0,
-                                                            remark: "",
-                                                            total: 0,
-                                                        })
-                                                    }
-                                                    className="px-3 py-1 text-sm border rounded bg-blue-50 cursor-pointer text-blue-600"
-                                                >
-                                                    Add New Model
-                                                </button>
                                             </div>
+                                        ))}
+
+                                        <div className="flex justify-end mt-2">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    arrayHelpers.push({
+                                                        productId: "",
+                                                        colorId: "",
+                                                        qty: 0,
+                                                        price: 0,
+                                                        remark: "",
+                                                        total: 0,
+                                                    })
+                                                }
+                                                className="px-3 py-1 text-sm border rounded bg-blue-50 cursor-pointer text-blue-600"
+                                            >
+                                                Add New Model
+                                            </button>
                                         </div>
-                                    )}
-                                />
-                            </FormikProvider>
-                        </div>
+                                    </div>
+                                )}
+                            />
+                        </FormikProvider>
+                    </div>
 
-                        <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
-                            Summary
-                        </h2>
-                        <div className="pl-5">
-                            <div className="grid grid-cols-4 gap-4">
-                                <div className="p-3 bg-[#F9FAFB] rounded-md">
-                                    <div className="text-xs text-gray-500">Total Pending Price</div>
-                                    <div className="text-lg font-semibold">{totals.totalPendingPrice}</div>
-                                </div>
+                    <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
+                        Summary
+                    </h2>
+                    <div className="pl-5">
+                        <div className="grid grid-cols-4 gap-4">
+                            <div className="p-3 bg-[#F9FAFB] rounded-md">
+                                <div className="text-xs text-gray-500">Total Pending Price</div>
+                                <div className="text-lg font-semibold">{totals.totalPendingPrice}</div>
+                            </div>
 
-                                <div className="p-3 bg-[#F9FAFB] rounded-md">
-                                    <div className="text-xs text-gray-500">Total Price</div>
-                                    <div className="text-lg font-semibold">{totals.totalPrice}</div>
-                                </div>
+                            <div className="p-3 bg-[#F9FAFB] rounded-md">
+                                <div className="text-xs text-gray-500">Total Price</div>
+                                <div className="text-lg font-semibold">{totals.totalPrice}</div>
+                            </div>
 
-                                <div className="p-3 bg-[#F9FAFB] rounded-md">
-                                    <div className="text-xs text-gray-500">Total Pending Qty</div>
-                                    <div className="text-lg font-semibold">{totals.totalPendingQty}</div>
-                                </div>
+                            <div className="p-3 bg-[#F9FAFB] rounded-md">
+                                <div className="text-xs text-gray-500">Total Pending Qty</div>
+                                <div className="text-lg font-semibold">{totals.totalPendingQty}</div>
+                            </div>
 
-                                <div className="p-3 bg-[#F9FAFB] rounded-md">
-                                    <div className="text-xs text-gray-500">Total Qty</div>
-                                    <div className="text-lg font-semibold">{totals.totalQty}</div>
-                                </div>
+                            <div className="p-3 bg-[#F9FAFB] rounded-md">
+                                <div className="text-xs text-gray-500">Total Qty</div>
+                                <div className="text-lg font-semibold">{totals.totalQty}</div>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="flex gap-3 justify-end">
-                            <button
-                                type="submit"
-                                disabled={createOrderMutation.isPending}
-                                className="border px-6 py-2 bg-blue-50 cursor-pointer  rounded text-blue-600 hover:bg-blue-600 disabled:bg-blue-400 hover:text-white"
-                            >
-                                {createOrderMutation.isPending ? "Submitting..." : "Create Order"}
-                            </button>
+                    <div className="flex gap-3 justify-end">
+                        <button
+                            type="submit"
+                            disabled={createOrderMutation.isPending}
+                            className="border px-6 py-2 bg-blue-50 cursor-pointer  rounded text-blue-600 hover:bg-blue-600 disabled:bg-blue-400 hover:text-white"
+                        >
+                            {createOrderMutation.isPending ? "Submitting..." : "Create Order"}
+                        </button>
 
 
-                            <button
-                                type="button"
-                                disabled={createOrderMutation.isPending}
-                                onClick={() => navigate("/opticorders")}
-                                className="border px-4 py-2 rounded bg-red-50 cursor-pointer text-red-600 hover:bg-red-600 hover:text-white"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                disabled={createOrderMutation.isPending}
-                                onClick={() => formik.resetForm()}
-                                className="border px-4 py-2 rounded cursor-pointer"
-                            >
-                                Reset
-                            </button>
-                        </div>
+                        <button
+                            type="button"
+                            disabled={createOrderMutation.isPending}
+                            onClick={() => navigate("/opticorders")}
+                            className="border px-4 py-2 rounded bg-red-50 cursor-pointer text-red-600 hover:bg-red-600 hover:text-white"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            disabled={createOrderMutation.isPending}
+                            onClick={() => formik.resetForm()}
+                            className="border px-4 py-2 rounded cursor-pointer"
+                        >
+                            Reset
+                        </button>
+                    </div>
 
-                    </form>
-                </div>
+                </form>
             </div>
-        </>
+        </div>
     );
 }

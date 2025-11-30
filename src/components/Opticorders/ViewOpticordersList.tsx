@@ -124,22 +124,20 @@ export default function ViewOpticordersList({
     ];
 
     return (
-        <div className="p-6">
-            <CommonTable
-                data={rows}
-                columns={columns}
-                pageIndex={pageIndex}
-                pageSize={pageSize}
-                totalEntries={totalEntries}
-                pageCount={pageCount}
-                onPageChange={onPageChange}
-                sortBy={sortBy}
-                sortOrder={sortOrder}
-                onSortChange={onSortChange}
-                onSelectionChange={(ids) => setSelectedIds(ids)}
-                idAccessor={(row) => row.id}
-                showDeleteButton={true} onDeleteSelected={handleDeleteSelected}
-            />
-        </div>
+        <CommonTable
+            data={rows}
+            columns={columns}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            totalEntries={totalEntries}
+            pageCount={pageCount}
+            onPageChange={onPageChange}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortChange={onSortChange}
+            onSelectionChange={(ids) => setSelectedIds(ids)}
+            idAccessor={(row) => row.id}
+            showDeleteButton={true} onDeleteSelected={handleDeleteSelected}
+        />
     );
 }

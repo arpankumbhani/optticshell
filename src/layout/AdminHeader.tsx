@@ -77,8 +77,15 @@ const AdminHeader: React.FC = () => {
                 className="flex items-center gap-2 focus:outline-none"
               >
                 <div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium uppercase">
-                  {user?.username?.[0] || user?.email?.[0]}
+                  {user?.profile_logo ? (
+                    <img src={user?.profile_logo} alt="Profile" className="w-full h-full rounded-full" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium uppercase">
+                      {user?.username?.[0] || user?.email?.[0]}
+                    </div>
+                  )}
                 </div>
+                <span className="text-gray-600">{user?.username}</span>
                 <ChevronDown
                   className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? "rotate-180" : ""
                     }`}

@@ -47,7 +47,7 @@ export default function DeletedOrders() {
 
   return (
     <div className="p-4 ml-2">
-      <div className="text-[#191B1C] font-medium py-2">DeletedOrders</div>
+      <div className="text-[#191B1C] font-medium text-lg pb-4">DeletedOrders</div>
 
       <DeletedOpticordersList
         rows={rows}

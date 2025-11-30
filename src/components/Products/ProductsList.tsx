@@ -41,15 +41,17 @@ export default function ProductsList({
     ];
 
     return (
-        <><div className="flex justify-end w-full">
-            <button
-                type="button"
-                className="border px-6 py-2 bg-blue-50 cursor-pointer  rounded text-blue-600 hover:bg-blue-600 disabled:bg-blue-400 hover:text-white"
-                onClick={() => navigate("/products/create")}
-            >
-                Create Product
-            </button>
-        </div>
+        <>
+            <div className="flex justify-between items-center w-full">
+                <div className="text-[#191B1C] font-medium text-lg">Products</div>
+                <button
+                    type="button"
+                    className="border px-6 py-2 mr-6 bg-blue-50 cursor-pointer  rounded text-blue-600 hover:bg-blue-600 disabled:bg-blue-400 hover:text-white"
+                    onClick={() => navigate("/products/create")}
+                >
+                    Create Product
+                </button>
+            </div>
             <div className="p-6">
                 <CommonTable
                     data={rows}

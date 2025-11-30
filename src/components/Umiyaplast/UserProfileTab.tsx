@@ -1,7 +1,7 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import UserCircle from "../../assets/svg/user-circle.svg?react";
@@ -76,33 +76,26 @@ export default function UserProfileTab() {
             {/* User Profile Header */}
             <div>
                 <h2 className="font-semibold text-xl mb-4">User Profile</h2>
-
                 <div className="grid grid-cols-12 gap-6">
-
-                    {/* Profile Preview (Upload Disabled) */}
                     <div className="col-span-2 bg-[#F9FAFB] h-fit mt-2">
-
-                        <div className="flex flex-col items-center justify-center border border-gray-200 rounded-lg py-8 ">
-                            <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden">
-                                {preview ? (
-                                    <img
-                                        src={``}
-                                        alt="Profile Preview"
-                                        className="object-cover w-full h-full rounded-full"
-                                    />
-                                ) : (
+                        {preview ? (
+                            <img
+                                src={preview}
+                                alt="Profile Preview"
+                                className="w-50 h-50 rounded-lg"
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center border border-gray-200 rounded-lg py-8 ">
+                                <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden">
                                     <UserCircle className="w-40 h-40 text-gray-400" />
-                                )}
+                                </div>
+                                <p className="mt-4 text-[#6D717F] font-medium">
+                                    Upload Disabled
+                                </p>
                             </div>
-                            <p className="mt-4 text-[#6D717F] font-medium">
-                                Upload Disabled
-                            </p>
-                        </div>
+                        )}
                     </div>
-
-                    {/* User Information */}
                     <div className="col-span-6 grid grid-cols-2 gap-4">
-
                         {[
                             { label: "Full Name", name: "fullName" },
                             { label: "Username", name: "username" },

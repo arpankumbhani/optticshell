@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { generatePdfAPI, getOrderDetailsAPI } from "../../api/order.api";
@@ -11,14 +11,11 @@ export default function ViewOpticorders() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [openMenu, setOpenMenu] = useState(false);
-
     const { data, isLoading, isError, error } = useQuery<OrderDetailsResponse>({
         queryKey: ["orderDetailsAPI", id],
         queryFn: () => getOrderDetailsAPI(id!),
         enabled: !!id,
     });
-
-
     const queryClient = useQueryClient();
     const generatePdfMutation = useMutation({
         mutationFn: (id: string) => generatePdfAPI(id),
@@ -48,7 +45,6 @@ export default function ViewOpticorders() {
     if (isLoading) {
         return <div className="p-4 ml-2">Loading order details...</div>;
     }
-
     if (isError || !data || !data.data) {
         return (
             <div className="p-4 ml-2 text-red-500">
@@ -56,17 +52,11 @@ export default function ViewOpticorders() {
             </div>
         );
     }
-
     const order = data?.data;
-
-
     return (
         <div className="p-4 ml-2">
             <div className="flex justify-items-start mb-2 gap-4 items-center">
-                <div className="text-[#191B1C] font-medium py-2">
-                    Order Overview
-                </div>
-
+                <div className="text-[#191B1C] font-medium text-lg"> Order Overview</div>
                 <div className="relative">
                     <button
                         onClick={() => setOpenMenu(!openMenu)}
@@ -289,90 +279,88 @@ export default function ViewOpticorders() {
                             </div>
                         </div>
                     </div>
-                    <div className="p-6">
+                </div>
 
-                        <div className="overflow-x-auto border rounded-xl border-gray-200">
-                            <table className="min-w-full rounded-xl text-sm text-left">
-                                <thead className="bg-[#F9FAFB] text-gray-600 uppercase text-xs">
-                                    <tr>
-                                        <th className="px-6 py-3 font-medium">Name</th>
-                                        <th className="px-6 py-3 font-medium">Color</th>
-                                        <th className="px-6 py-3 font-medium">Quantity</th>
-                                        <th className="px-6 py-3 font-medium">Price</th>
-                                        <th className="px-6 py-3 font-medium">Remark</th>
-                                        <th className="px-6 py-3 font-medium">Total Price</th>
-                                        <th className="px-6 py-3 font-medium">Modify Details</th>
-                                    </tr>
-                                </thead>
+                <div className="border mt-4 border-gray-200 bg-white rounded-lg">
+                    <div className="overflow-x-auto border rounded-lg border-gray-200">
+                        <table className="min-w-full rounded-lg text-sm text-left">
+                            <thead className="bg-[#F9FAFB] text-gray-600 uppercase text-xs">
+                                <tr>
+                                    <th className="px-6 py-3 font-medium">Name</th>
+                                    <th className="px-6 py-3 font-medium">Color</th>
+                                    <th className="px-6 py-3 font-medium">Quantity</th>
+                                    <th className="px-6 py-3 font-medium">Price</th>
+                                    <th className="px-6 py-3 font-medium">Remark</th>
+                                    <th className="px-6 py-3 font-medium">Total Price</th>
+                                    <th className="px-6 py-3 font-medium">Modify Details</th>
+                                </tr>
+                            </thead>
 
-                                <tbody className="divide-y divide-gray-100 text-gray-700">
-                                    {order?.order_models.map((item: OrderModel) => (
-                                        <tr key={item.id}>
-                                            <td className="px-6 py-3">{item.name}</td>
-                                            <td className="px-6 py-3">{item.color_name}</td>
-                                            <td className="px-6 py-3">{item.qty}</td>
-                                            <td className="px-6 py-3">{item.price}</td>
-                                            <td className="px-6 py-3">{item.remark || "-"}</td>
-                                            <td className="px-6 py-3">{item.total_price}</td>
+                            <tbody className="divide-y divide-gray-100 text-gray-700">
+                                {order?.order_models && (order?.order_models)?.map((item: OrderModel) => (
+                                    <tr key={item.id}>
+                                        <td className="px-6 py-3">{item.name}</td>
+                                        <td className="px-6 py-3">{item.color_name}</td>
+                                        <td className="px-6 py-3">{item.qty}</td>
+                                        <td className="px-6 py-3">{item.price}</td>
+                                        <td className="px-6 py-3">{item.remark || "-"}</td>
+                                        <td className="px-6 py-3">{item.total_price}</td>
 
-                                            <td className="px-6 py-3 align-top">
-                                                {item.modify_details && item.modify_details.length > 0 ? (
-                                                    <div className="w-full rounded-lg bg-gray-50 p-3 shadow-sm">
+                                        <td className="px-6 py-3 align-top">
+                                            {item.modify_details && item.modify_details.length > 0 ? (
+                                                <div className="w-full rounded-lg bg-gray-50 p-3 shadow-sm">
 
-                                                        <div className="grid grid-cols-4 text-xs font-semibold text-gray-600 pb-2 border-b">
-                                                            <span>By</span>
-                                                            <span>Date</span>
-                                                            <span>Modify Qty</span>
-                                                            <span>Prev Qty</span>
-                                                        </div>
-
-                                                        {item.modify_details.map((md, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className={`grid grid-cols-4 text-xs py-2 `}
-                                                            >
-                                                                <span className="text-gray-800">{md.modify_by}</span>
-
-                                                                <span className="text-gray-800">
-                                                                    {formatDateTime(md.modify_date)}
-                                                                </span>
-
-                                                                <span
-                                                                    className={`
-                                                                    ${md.modify_qty < 0
-                                                                            ? "text-red-600"
-                                                                            : md.modify_qty > 0
-                                                                                ? "text-green-600"
-                                                                                : "text-gray-800"
-                                                                        }`}
-                                                                >
-                                                                    {md.modify_qty}
-                                                                </span>
-
-                                                                <span className="text-gray-800">{md.prev_qty}</span>
-                                                            </div>
-                                                        ))}
+                                                    <div className="grid grid-cols-4 text-xs font-semibold text-gray-600 pb-2 border-b">
+                                                        <span>By</span>
+                                                        <span>Date</span>
+                                                        <span>Modify Qty</span>
+                                                        <span>Prev Qty</span>
                                                     </div>
-                                                ) : (
-                                                    <span className="text-gray-400 text-xs">No modifications</span>
-                                                )}
-                                            </td>
 
-                                        </tr>
-                                    ))}
-                                    {order?.order_models.length === 0 && (
-                                        <tr>
-                                            <td colSpan={7} className="text-center py-4">
-                                                No order models found
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+                                                    {item.modify_details.map((md, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className={`grid grid-cols-4 text-xs py-2 `}
+                                                        >
+                                                            <span className="text-gray-800">{md.modify_by}</span>
+
+                                                            <span className="text-gray-800">
+                                                                {formatDateTime(md.modify_date)}
+                                                            </span>
+
+                                                            <span
+                                                                className={`
+                                                                    ${md.modify_qty < 0
+                                                                        ? "text-red-600"
+                                                                        : md.modify_qty > 0
+                                                                            ? "text-green-600"
+                                                                            : "text-gray-800"
+                                                                    }`}
+                                                            >
+                                                                {md.modify_qty}
+                                                            </span>
+
+                                                            <span className="text-gray-800">{md.prev_qty}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <span className="text-gray-400 text-xs">No modifications</span>
+                                            )}
+                                        </td>
+
+                                    </tr>
+                                ))}
+                                {order?.order_models && order?.order_models.length === 0 && (
+                                    <tr>
+                                        <td colSpan={7} className="text-center py-4">
+                                            No order models found
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
-
-
                 </div>
             </div>
         </div>

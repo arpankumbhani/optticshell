@@ -53,8 +53,7 @@ export default function ViewOpticOrders() {
 
     return (
         <div className="p-4 ml-2">
-            <div className="text-[#191B1C] font-medium py-2">Opticorders</div>
-
+            <div className="text-[#191B1C] font-medium text-lg pb-4">Optticorders</div>
             <ViewOpticordersList
                 rows={rows}
                 pageIndex={pageIndex}

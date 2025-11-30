@@ -9,12 +9,12 @@ export default function DeletedRequestUser() {
     const { data, isLoading, isError } = useQuery<any>({
         queryKey: ["getDeleteRequestedUsersAPI",],
         queryFn: () => getDeleteRequestedUsersAPI(),
-        placeholderData: (prev) => prev,
+        placeholderData: (prev: any) => prev,
     });
 
 
     const rows: any[] = useMemo(() => {
-        return (data?.data ?? []).map((o) => ({
+        return (data?.data ?? []).map((o: any) => ({
             id: o.id,
             name: String(o.name),
             email: o.email,
@@ -23,7 +23,7 @@ export default function DeletedRequestUser() {
     }, [data]);
     return (
         <div className="p-4 ml-2">
-            <div className="text-[#191B1C] font-medium py-2">Deleted Request User</div>
+            <div className="text-[#191B1C] font-medium text-lg pb-4">Deleted Request User</div>
 
             <DeletedRequestUserList
                 rows={rows}

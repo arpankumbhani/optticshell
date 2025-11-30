@@ -47,8 +47,6 @@ export default function Products() {
 
     return (
         <div className="p-4 ml-2">
-            <div className="text-[#191B1C] font-medium py-2">Products</div>
-
             <ProductsList
                 rows={rows}
                 pageIndex={pageIndex}

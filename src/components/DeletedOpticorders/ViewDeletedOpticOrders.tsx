@@ -1,331 +1,251 @@
 import { useQuery } from '@tanstack/react-query';
 import { getDeletedOrderDetailsAPI } from '../../api/order.api';
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ViewDeletedOpticOrders() {
     const { id } = useParams<{ id: string }>();
-    const [openMenu, setOpenMenu] = useState(false);
+    const navigate = useNavigate();
 
-
-
-    const { data: deletedOrderDetails, isLoading, isError, error } = useQuery({
+    const { data, isLoading, isError, error } = useQuery({
         queryKey: ["getDeletedOrderDetailsAPI"],
         queryFn: () => getDeletedOrderDetailsAPI(id!),
         enabled: !!id,
     });
-    if (isError || !deletedOrderDetails || !deletedOrderDetails.data) {
+    if (isError || !data || !data.data) {
         return (
             <div className="p-4 ml-2 text-red-500">
                 {error?.message ?? "Failed to load order details"}
             </div>
         );
     }
+
+    const deletedOrderDetails = data?.data;
+
     return (
-        // <div className="p-4 ml-2">
-        //     <div className="flex justify-items-start mb-2 gap-4 items-center">
-        //         <div className="text-[#191B1C] font-medium py-2">
-        //             Order Overview
-        //         </div>
+        <>
+            <div className="p-4 ml-2">
+                <button onClick={() => navigate(-1)} className="flex items-center gap-1 border border-[#0E5FD9] text-[#0E5FD9] rounded-full px-2 cursor-pointer hover:text-[#0037ff] hover:border-[#0037ff]">
+                    <ChevronLeft className="w-5 h-5" />
+                    <span className="mb-1"> Go Back</span>
+                </button>
+                <div className="text-[#191B1C] font-medium text-lg py-2">Deleted Order Details</div>
+                <div className="p-6 bg-white rounded-md shadow-sm mx-auto">
+                    <h2 className="text-gray-800 font-semibold mb-4 bg-[#F9FAFB] p-2 rounded-md pl-5">
+                        Deleted Order Details
+                    </h2>
+                    <div className="pl-5">
+                        <div className="grid grid-cols-12 gap-6">
+                            <div className="col-span-8 grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">Order Number</label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.order_number}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">Name</label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.name}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
 
-        //         <div className="relative">
-        //             <button
-        //                 onClick={() => setOpenMenu(!openMenu)}
-        //                 className="px-3 py-1.5 border-[1.5px] border-[#0E5FD9] text-[#0E5FD9] rounded-md bg-[#ffff] shadow-sm hover:bg-gray-100 flex items-center gap-1 cursor-pointer"
-        //             >
-        //                 Actions
-        //                 <svg
-        //                     className={`w-4 h-4 transition-transform ${openMenu ? "rotate-180" : ""}`}
-        //                     fill="none"
-        //                     stroke="currentColor"
-        //                     strokeWidth="2"
-        //                     viewBox="0 0 24 24"
-        //                 >
-        //                     <path d="m6 9 6 6 6-6" />
-        //                 </svg>
-        //             </button>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Billing Contact
+                                    </label>
+                                    <select
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    >
+                                        <option>{deletedOrderDetails.billing_contact}</option>
+                                    </select>
+                                </div>
 
-        //             {openMenu && (
-        //                 <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1 animate-fadeIn">
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Billing Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={deletedOrderDetails.billing_email}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
 
-        //                     <button
-        //                         className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-        //                         onClick={() => handleRecover(id as string)}
-        //                     >
-        //                         <FileText size={16} className="text-[#0E5FD9]" />
-        //                         Order Recover
-        //                     </button>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Main Category
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.main_category}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
 
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Sub Category
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.sub_category}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
 
-        //                 </div>
-        //             )}
-        //         </div>
-        //     </div>
-        //     <div className="">
-        //         <div className="border border-gray-200 bg-white rounded-lg">
-        //             <div className="flex items-center mt-4 mx-4 justify-between bg-[#F9FAFB] p-3 pl-5 rounded-lg">
-        //                 <h2 className="text-gray-800 font-semibold">Order Details</h2>
-        //             </div>
-        //             <div className="grid grid-cols-12 gap-6">
-        //                 <div className="p-6 pl-10 col-span-8 grid grid-cols-2 gap-4">
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">Order No</label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.order_number}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Sub Customer Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.sub_customer_name}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
 
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">Name</label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.name}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Sub Customer Details
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.sub_customer_detail}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
 
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Billing Contact
-        //                         </label>
-        //                         <select
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         >
-        //                             <option>{order?.billing_contact}</option>
-        //                         </select>
-        //                     </div>
+                                <div className="col-span-2">
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Order Remark
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.order_remark}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
 
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Billing Email
-        //                         </label>
-        //                         <input
-        //                             type="email"
-        //                             value={order?.billing_email}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Total Pending Price
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.total_pending_price}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Total Pending Qty
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.total_pending_qty}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Total Dispatch Price
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.total_dispatch_price}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">
+                                        Total Dispatch Qty
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.total_dispatch_qty}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">Total Price</label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.total_price}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[#131927] font-medium text-sm mb-1">Total Qty</label>
+                                    <input
+                                        type="text"
+                                        value={deletedOrderDetails.total_qty}
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Main Category
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.main_category}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
+                <div className="border border-gray-200 bg-white rounded-lg mt-4">
 
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Sub Category
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.sub_category}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
+                    <div className="overflow-x-auto border rounded-lg border-gray-200">
+                        <table className="min-w-full rounded-lg text-sm text-left">
+                            <thead className="bg-[#F9FAFB] text-gray-600 uppercase text-xs">
+                                <tr>
+                                    <th className="px-6 py-3 font-medium">Name</th>
+                                    <th className="px-6 py-3 font-medium">Color</th>
+                                    <th className="px-6 py-3 font-medium">Quantity</th>
+                                    <th className="px-6 py-3 font-medium">Price</th>
+                                    <th className="px-6 py-3 font-medium">Remark</th>
+                                    <th className="px-6 py-3 font-medium">Total Price</th>
+                                </tr>
+                            </thead>
 
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Sub Customer Name
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.sub_customer_name}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Sub Customer Details
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.sub_customer_detail}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-
-        //                     <div className="col-span-2">
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Order Remark
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.order_remark}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Total Pending Price
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.total_pending_price}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Total Pending Qty
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.total_pending_qty}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Total Dispatch Price
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value={order?.total_dispatch_price}
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">
-        //                             Total Dispatch Qty
-        //                         </label>
-        //                         <input
-        //                             type="text"
-        //                             value="0"
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">Total Price</label>
-        //                         <input
-        //                             type="text"
-        //                             value="23040"
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-        //                     <div>
-        //                         <label className="text-[#131927] font-medium text-sm mb-1">Total Qty</label>
-        //                         <input
-        //                             type="text"
-        //                             value="1920"
-        //                             disabled
-        //                             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
-        //                         />
-        //                     </div>
-        //                 </div>
-        //             </div>
-        //             <div className="p-6">
-
-        //                 <div className="overflow-x-auto border rounded-xl border-gray-200">
-        //                     <table className="min-w-full rounded-xl text-sm text-left">
-        //                         <thead className="bg-[#F9FAFB] text-gray-600 uppercase text-xs">
-        //                             <tr>
-        //                                 <th className="px-6 py-3 font-medium">Name</th>
-        //                                 <th className="px-6 py-3 font-medium">Color</th>
-        //                                 <th className="px-6 py-3 font-medium">Quantity</th>
-        //                                 <th className="px-6 py-3 font-medium">Price</th>
-        //                                 <th className="px-6 py-3 font-medium">Remark</th>
-        //                                 <th className="px-6 py-3 font-medium">Total Price</th>
-        //                                 <th className="px-6 py-3 font-medium">Modify Details</th>
-        //                             </tr>
-        //                         </thead>
-
-        //                         <tbody className="divide-y divide-gray-100 text-gray-700">
-        //                             {order?.order_models.map((item: OrderModel) => (
-        //                                 <tr key={item.id}>
-        //                                     <td className="px-6 py-3">{item.name}</td>
-        //                                     <td className="px-6 py-3">{item.color_name}</td>
-        //                                     <td className="px-6 py-3">{item.qty}</td>
-        //                                     <td className="px-6 py-3">{item.price}</td>
-        //                                     <td className="px-6 py-3">{item.remark || "-"}</td>
-        //                                     <td className="px-6 py-3">{item.total_price}</td>
-
-        //                                     <td className="px-6 py-3 align-top">
-        //                                         {item.modify_details && item.modify_details.length > 0 ? (
-        //                                             <div className="w-full rounded-lg bg-gray-50 p-3 shadow-sm">
-
-        //                                                 <div className="grid grid-cols-4 text-xs font-semibold text-gray-600 pb-2 border-b">
-        //                                                     <span>By</span>
-        //                                                     <span>Date</span>
-        //                                                     <span>Modify Qty</span>
-        //                                                     <span>Prev Qty</span>
-        //                                                 </div>
-
-        //                                                 {item.modify_details.map((md, index) => (
-        //                                                     <div
-        //                                                         key={index}
-        //                                                         className={`grid grid-cols-4 text-xs py-2 `}
-        //                                                     >
-        //                                                         <span className="text-gray-800">{md.modify_by}</span>
-
-        //                                                         <span className="text-gray-800">
-        //                                                             {formatDateTime(md.modify_date)}
-        //                                                         </span>
-
-        //                                                         <span
-        //                                                             className={`
-        //                                                             ${md.modify_qty < 0
-        //                                                                     ? "text-red-600"
-        //                                                                     : md.modify_qty > 0
-        //                                                                         ? "text-green-600"
-        //                                                                         : "text-gray-800"
-        //                                                                 }`}
-        //                                                         >
-        //                                                             {md.modify_qty}
-        //                                                         </span>
-
-        //                                                         <span className="text-gray-800">{md.prev_qty}</span>
-        //                                                     </div>
-        //                                                 ))}
-        //                                             </div>
-        //                                         ) : (
-        //                                             <span className="text-gray-400 text-xs">No modifications</span>
-        //                                         )}
-        //                                     </td>
-
-        //                                 </tr>
-        //                             ))}
-        //                             {order?.order_models.length === 0 && (
-        //                                 <tr>
-        //                                     <td colSpan={7} className="text-center py-4">
-        //                                         No order models found
-        //                                     </td>
-        //                                 </tr>
-        //                             )}
-        //                         </tbody>
-        //                     </table>
-        //                 </div>
-        //             </div>
-
-
-        //         </div>
-        //     </div>
-        // </div>
-        <div>
-
-        </div>
+                            <tbody className="divide-y divide-gray-100 text-gray-700">
+                                {deletedOrderDetails.order_models.map((item: any) => (
+                                    <tr key={item.id}>
+                                        <td className="px-6 py-3">{item.name}</td>
+                                        <td className="px-6 py-3">{item.color_name}</td>
+                                        <td className="px-6 py-3">{item.qty}</td>
+                                        <td className="px-6 py-3">{item.price}</td>
+                                        <td className="px-6 py-3">{item.remark || "-"}</td>
+                                        <td className="px-6 py-3">{item.total_price}</td>
+                                    </tr>
+                                ))}
+                                {deletedOrderDetails.order_models.length === 0 && (
+                                    <tr>
+                                        <td colSpan={6} className="text-center py-4">
+                                            No deleted order models found
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </>
     )
 }

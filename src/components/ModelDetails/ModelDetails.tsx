@@ -5,9 +5,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import UseToast from "../../hooks/useToast";
+import { ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function ModelDetails() {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const { data: dispatchData, isLoading } = useQuery({
@@ -112,7 +115,10 @@ export default function ModelDetails() {
     return (
         <div className="p-4 ml-2">
             {/* <div className="text-[#191B1C] font-medium py-2">Model Details</div> */}
-
+            <button onClick={() => navigate(-1)} className="flex items-center gap-1 border border-[#0E5FD9] text-[#0E5FD9] rounded-full px-2 cursor-pointer hover:text-[#0037ff] hover:border-[#0037ff]">
+                <ChevronLeft className="w-5 h-5" />
+                <span className="mb-1"> Go Back</span>
+            </button>
             <div className="p-6">
 
                 <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">

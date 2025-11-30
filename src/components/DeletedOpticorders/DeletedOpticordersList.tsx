@@ -90,20 +90,18 @@ export default function DeletedOpticordersList({
     ];
 
     return (
-        <div className="p-6">
-            <CommonTable
-                data={rows}
-                columns={columns}
-                pageIndex={pageIndex}
-                pageSize={pageSize}
-                totalEntries={totalEntries}
-                pageCount={pageCount}
-                onPageChange={onPageChange}
-                sortBy={sortBy}
-                sortOrder={sortOrder}
-                onSortChange={onSortChange}
-                showCheckbox={false}
-            />
-        </div>
+        <CommonTable
+            data={rows}
+            columns={columns}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            totalEntries={totalEntries}
+            pageCount={pageCount}
+            onPageChange={onPageChange}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortChange={onSortChange}
+            showCheckbox={false}
+        />
     )
 }

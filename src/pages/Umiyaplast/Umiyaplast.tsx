@@ -20,8 +20,8 @@ export default function Umiyaplast() {
 
     return (
         <>
-            <div className="p-6 ml-2">
-                <div className="text-[#191B1C] font-medium py-2">Umiyaplast</div>
+            <div className="p-4 ml-2">
+                <div className="text-[#191B1C] font-medium text-lg pb-4">Umiyaplast</div>
             </div>
             <div className="px-6 ml-2">
                 <div className="border border-gray-200 bg-[#ffff] rounded-lg">
