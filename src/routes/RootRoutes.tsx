@@ -12,6 +12,9 @@ import ViewOpticOrders from "../pages/ViewOpticorders/ViewOpticOrders";
 import CreateOpticorder from "../components/Opticorders/CreateOpticorder";
 import DeletedRequestUser from "../pages/DeletedRequestUser/DeletedRequestUser";
 import ModelDetails from "../components/ModelDetails/ModelDetails";
+import ViewDeletedOpticOrders from "../components/DeletedOpticorders/ViewDeletedOpticOrders";
+import Products from "../pages/Products/Products";
+import CreateProduct from "../components/Products/CreateProduct";
 
 export default function RootRoutes() {
 
@@ -26,10 +29,13 @@ export default function RootRoutes() {
                         <Route path="/opticorders" element={<Opticorders />} />
                         <Route path="view-opticorders/:id" element={<ViewOpticorders />} />
                         <Route path="view-opticorders" element={<ViewOpticOrders />} />
+                        <Route path="view-deleted-opticorders/:id" element={<ViewDeletedOpticOrders />} />
                         <Route path="edit-opticorders/:id" element={<EditOpticorders />} />
                         <Route path="model-details/:id" element={<ModelDetails />} />
                         <Route path="/deleted-order" element={<DeletedOrders />} />
                         <Route path="/deleted-request-user" element={<DeletedRequestUser />} />
+                        <Route path="/products" element={<Products />} />
+                        <Route path="/products/create" element={<CreateProduct />} />
 
 
                         <Route path="/umiyaplast" element={<Umiyaplast />} />

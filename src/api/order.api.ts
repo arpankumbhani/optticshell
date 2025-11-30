@@ -155,3 +155,12 @@ export const addDispatchDetailsAPI = async (payload: any): Promise<any> => {
 
   return response;
 };
+
+export const getDeletedOrderDetailsAPI = async (id: string): Promise<any> => {
+  const response = await request({
+    url: `order/getDeletedOrderDetails/${id}`,
+    method: "GET",
+  });
+
+  return response;
+};

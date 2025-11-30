@@ -86,7 +86,7 @@ export default function UserProfileTab() {
                             <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden">
                                 {preview ? (
                                     <img
-                                        src={preview}
+                                        src={``}
                                         alt="Profile Preview"
                                         className="object-cover w-full h-full rounded-full"
                                     />

@@ -9,6 +9,7 @@ import UserIcon from "../assets/svg/user.svg?react";
 import FileIcon from "../assets/svg/file.svg?react";
 import NoteIcon from "../assets/svg/note.svg?react";
 import ListIcon from "../assets/svg/list.svg?react";
+import { Box, UserMinus } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -21,14 +22,15 @@ const navItems: NavItem[] = [
   // { icon: <OpticOrders />, name: "Optitcorders", path: "/opticorders" },
   { icon: <ViewOpticOrders />, name: "View OpticOrders", path: "/view-opticorders" },
   { icon: <DeletedOrder />, name: "Deleted Order", path: "/deleted-order" },
-  { icon: <DeletedOrder />, name: "Deleted Request User", path: "/deleted-request-user" },
+  { icon: <UserMinus className="w-5 h-5" />, name: "Deleted Request User", path: "/deleted-request-user" },
+  { icon: <Box className="w-5 h-5" />, name: "Products", path: "/products" },
 ];
 
 const listItems: NavItem[] = [
   { icon: <UserIcon />, name: "UmiyPlast", path: "/umiyaplast" },
-  { icon: <FileIcon />, name: "Plain Order", path: "/plain-order" },
-  { icon: <ListIcon />, name: "Old Block Format", path: "/old-block-format" },
-  { icon: <NoteIcon />, name: "New Block Size", path: "/new-block-size" },
+  // { icon: <FileIcon />, name: "Plain Order", path: "/plain-order" },
+  // { icon: <ListIcon />, name: "Old Block Format", path: "/old-block-format" },
+  // { icon: <NoteIcon />, name: "New Block Size", path: "/new-block-size" },
 ];
 
 const AdminSidebar: React.FC = () => {

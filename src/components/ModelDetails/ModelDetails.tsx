@@ -21,34 +21,36 @@ export default function ModelDetails() {
         onSuccess: (res: any) => {
             UseToast(res?.message || "Dispatch details added successfully", "success");
             queryClient.invalidateQueries({ queryKey: ["orderDetailsAPI", id] });
+            formik.resetForm();
         },
         onError: (err: any) => {
             console.error("Update Error:", err);
             UseToast(err?.message || "Failed to add dispatch details", "error");
+            formik.resetForm();
         },
     });
 
     const products: any[] = dispatchData?.data?.products || [];
     const [qtyValues, setQtyValues] = useState<{ [key: string]: number }>({});
 
-    const totalDispatchAmount = Object.keys(qtyValues).reduce((sum, prodId) => {
-        const product = products.find((p: any) => p.id === prodId);
-        return sum + (qtyValues[prodId] || 0) * (product?.price || 0);
-    }, 0);
+    // const totalDispatchAmount = Object.keys(qtyValues).reduce((sum, prodId) => {
+    //     const product = products.find((p: any) => p.id === prodId);
+    //     return sum + (qtyValues[prodId] || 0) * (product?.price || 0);
+    // }, 0);
 
 
     const formik = useFormik({
         initialValues: {
             dispatch_date: "",
             challan_no: "",
-            total_price: "",
+            total_parcel: "",
             transport: "",
             lr_no: "",
         },
         validationSchema: Yup.object({
             dispatch_date: Yup.date().required("Date is Required"),
             challan_no: Yup.string().required("Challan No is Required"),
-            total_price: Yup.number().required("Total Price is Required"),
+            total_parcel: Yup.number().required("Total Parcel is Required"),
             transport: Yup.string().required("Transport is Required"),
             lr_no: Yup.string().required("LR No is Required"),
         }),
@@ -79,7 +81,6 @@ export default function ModelDetails() {
                 dispatch_date: values.dispatch_date,
                 challan_no: values.challan_no,
                 total_parcel: dispatchedProducts.reduce((sum, p: any) => sum + p.dispatched_quantity, 0),
-                total_price: totalDispatchAmount,
                 transporter: values.transport,
                 lr_no: values.lr_no,
                 products: dispatchedProducts,
@@ -90,9 +91,9 @@ export default function ModelDetails() {
         },
     });
 
-    useEffect(() => {
-        formik.setFieldValue("total_price", totalDispatchAmount || "");
-    }, [totalDispatchAmount]);
+    // useEffect(() => {
+    //     formik.setFieldValue("total_price", totalDispatchAmount || "");
+    // }, [totalDispatchAmount]);
 
     const handleQtyChange = (productId: string, value: string) => {
         const qty = Math.max(0, Number(value) || 0);
@@ -110,7 +111,7 @@ export default function ModelDetails() {
 
     return (
         <div className="p-4 ml-2">
-            <div className="text-[#191B1C] font-medium py-2">Model Details</div>
+            {/* <div className="text-[#191B1C] font-medium py-2">Model Details</div> */}
 
             <div className="p-6">
 
@@ -239,7 +240,7 @@ export default function ModelDetails() {
                                     <tr>
                                         <th className="px-4 py-3 text-left">DISPATCH DATE</th>
                                         <th className="px-4 py-3 text-left">CHALLAN NO</th>
-                                        <th className="px-4 py-3 text-left">TOTAL PRICE</th>
+                                        <th className="px-4 py-3 text-left">TOTAL PARCEL</th>
                                         <th className="px-4 py-3 text-left">TRANSPORT</th>
                                         <th className="px-4 py-3 text-left">LR NO</th>
                                     </tr>
@@ -276,13 +277,13 @@ export default function ModelDetails() {
                                         <td className="px-4 py-2">
                                             <input
                                                 type="number"
-                                                name="total_price"
+                                                name="total_parcel"
                                                 className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                value={formik.values.total_price}
+                                                value={formik.values.total_parcel}
                                                 onChange={formik.handleChange}
                                             />
-                                            {formik.touched.total_price && formik.errors.total_price && (
-                                                <p className="text-red-500 text-xs">{formik.errors.total_price}</p>
+                                            {formik.touched.total_parcel && formik.errors.total_parcel && (
+                                                <p className="text-red-500 text-xs">{formik.errors.total_parcel}</p>
                                             )}
                                         </td>
 

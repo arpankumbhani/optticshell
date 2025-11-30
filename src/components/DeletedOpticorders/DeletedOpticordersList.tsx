@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { recoverDeletedOrderAPI } from '../../api/order.api';
 import UseToast from '../../hooks/useToast';
 import { formatDate } from '../../helper/DateFormate';
+import { useNavigate } from 'react-router-dom';
 
 interface DeletedOpticordersListProps {
     rows: DeletedOpticorderRow[];
@@ -29,10 +30,7 @@ export default function DeletedOpticordersList({
     sortOrder,
     onSortChange,
 }: DeletedOpticordersListProps) {
-    // const navigate = useNavigate();
-    // const handleViewOrder = (id: string) => {
-    //     navigate(`/view-opticorders/${id}`);
-    // };
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const recoverMutation = useMutation({
         mutationFn: (id: string) => recoverDeletedOrderAPI(id),
@@ -48,20 +46,23 @@ export default function DeletedOpticordersList({
     const handleRecover = (orderId: string) => {
         recoverMutation.mutate(orderId);
     };
+    const handleViewDeletedOrder = (id: string) => {
+        navigate(`/view-deleted-opticorders/${id}`);
+    };
     const columns: CustomColumnDef<DeletedOpticorderRow>[] = [
         {
             accessorKey: "order_no",
             id: "order_number",
             header: "ORDER NO.",
             sortable: true,
-            // cell: ({ row }) => (
-            //     <button
-            //         className="text-[#4E61F6] font-semibold hover:underline text-underline-[#4E61F6]"
-            //         onClick={() => handleViewOrder(row.original.id)}
-            //     >
-            //         {row.original.order_no}
-            //     </button>
-            // ),
+            cell: ({ row }) => (
+                <button
+                    className="text-[#4E61F6] font-semibold hover:underline text-underline-[#4E61F6]"
+                    onClick={() => handleViewDeletedOrder(row.original.id)}
+                >
+                    {row.original.order_no}
+                </button>
+            ),
         },
         { accessorKey: "contacts", id: "contact_name", header: "CONTACTS", sortable: false },
         { accessorKey: "main_category", header: "MAIN CATEGORY", sortable: false },

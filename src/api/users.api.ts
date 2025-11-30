@@ -53,3 +53,12 @@ export const resetPasswordAPI = async (body: {
   });
   return response;
 };
+
+export const getUsersForOrderDropdown = async (): Promise<any> => {
+  const response = await request({
+    url: `users/getUsersForOrderDropdown`,
+    method: "GET",
+  });
+
+  return response;
+};

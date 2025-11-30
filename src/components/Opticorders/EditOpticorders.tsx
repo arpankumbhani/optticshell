@@ -5,9 +5,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProductListAPI } from "../../api/product.api";
 import { getOrderDetailsAPI, updateAdminOrderAPI } from "../../api/order.api";
 import UseToast from "../../hooks/useToast";
-import { useAuthStore } from "../../store/authStore";
 import { convertFileToBase64 } from "../../helper/ImageTobase64";
 import { useNavigate, useParams } from "react-router-dom";
+import { getUsersForOrderDropdown } from "../../api/users.api";
 
 type ProductColor = { id: string; color_name: string; price: number };
 type Product = {
@@ -26,7 +26,6 @@ const mapCategoryType = (mainCategory: string, subCategory?: string) => {
 
 export default function EditOpticorder() {
     const { id } = useParams<{ id: string }>();
-    const { user } = useAuthStore();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -36,6 +35,15 @@ export default function EditOpticorder() {
         enabled: !!id,
         staleTime: 0,
     });
+
+    const { data: usersResp } = useQuery({
+        queryKey: ["usersForOrderDropdown"],
+        queryFn: () => getUsersForOrderDropdown(),
+    });
+    const users = usersResp?.data || null;
+
+    console.log("🚀 ~ EditOpticorder ~ usersResp:", users)
+
 
     const updateMutation = useMutation({
         mutationFn: (payload: any) => updateAdminOrderAPI(id!, payload),
@@ -58,6 +66,7 @@ export default function EditOpticorder() {
             orderNo: order?.order_number?.toString() || "",
             status: order?.status?.toString() ?? "0",
             billingContact: order?.billing_contact ?? "",
+            billingContactId: order?.user_id ?? "",
             mainCategory: order?.main_category === "Print Order" ? "2" : "1",
             subCategory:
                 order?.sub_category === "Foil Print Order"
@@ -99,7 +108,7 @@ export default function EditOpticorder() {
         initialValues: initialValues,
         enableReinitialize: true,
         validationSchema: Yup.object().shape({
-            billingContact: Yup.string().required("Billing contact is required"),
+            billingContactId: Yup.string().required("Billing contact is required"),
             mainCategory: Yup.string().required("Main Category is required"),
 
             subCategory: Yup.string().when("mainCategory", {
@@ -130,34 +139,54 @@ export default function EditOpticorder() {
 
         onSubmit: async (values) => {
             try {
-                const user_id = user?.id;
-
-                const category_type =
+                const category_type: any =
                     values.mainCategory === "1" ? 1 : Number(values.subCategory);
 
-                const base64Image = await convertFileToBase64(values.orderImage);
+                // const base64Image = await convertFileToBase64(values.orderImage);
 
-                const payload = {
-                    user_id: user_id,
-                    order_status: Number(values.status),
-                    category_type: category_type,
-                    order_type: Number(values.orderType || 0),
-                    sub_customer_name: values.subCustomerName,
-                    sub_customer_detail: values.subCustomerDetail,
-                    order_remark: values.orderRemark,
+                // const payload = {
+                //     user_id: values.billingContactId,
+                //     order_status: Number(values.status),
+                //     category_type: category_type,
+                //     order_type: Number(values.orderType || 0),
+                //     sub_customer_name: values.subCustomerName,
+                //     sub_customer_detail: values.subCustomerDetail,
+                //     order_remark: values.orderRemark,
 
-                    order_image: base64Image,
+                //     order_image: values.orderImage,
 
-                    order_models: values.models.map((m: any) => ({
-                        product_id: m.productId,
-                        product_color_id: m.colorId,
-                        quantity: m.qty,
-                        price: m.price,
-                        remark: m.remark,
-                    })),
-                };
+                //     order_models: values.models.map((m: any) => ({
+                //         product_id: m.productId,
+                //         product_color_id: m.colorId,
+                //         quantity: m.qty,
+                //         price: m.price,
+                //         remark: m.remark,
+                //     })),
+                // };
+                const formData = new FormData();
+                formData.append("user_id", values.billingContactId);
+                formData.append("order_status", values.status);
+                formData.append("category_type", category_type);
+                formData.append("order_type", values.orderType);
+                formData.append("sub_customer_name", values.subCustomerName || "");
+                formData.append("sub_customer_detail", values.subCustomerDetail || "");
+                formData.append("order_remark", values.orderRemark || "");
 
-                updateMutation.mutate(payload);
+                // VERY IMPORTANT → this must be a File object, NOT Base64, NOT Promise
+                if (values.orderImage instanceof File) {
+                    formData.append("order_image", values.orderImage);
+                }
+
+                // Append order models (array)
+                values.models.forEach((m: any, index: number) => {
+                    formData.append(`order_models[${index}][product_id]`, m.productId);
+                    formData.append(`order_models[${index}][product_color_id]`, m.colorId);
+                    formData.append(`order_models[${index}][quantity]`, m.qty);
+                    formData.append(`order_models[${index}][price]`, m.price);
+                    formData.append(`order_models[${index}][remark]`, m.remark || "");
+                });
+
+                updateMutation.mutate(formData);
             } catch (err) {
                 console.error("Submit error", err);
                 UseToast("Failed to submit", "error");
@@ -270,7 +299,7 @@ export default function EditOpticorder() {
                         </div>
 
                         <div className="col-span-1">
-                            <label className="text-[#131927] font-medium text-sm">Billing Contact</label>
+                            {/* <label className="text-[#131927] font-medium text-sm">Billing Contact</label>
                             <input
                                 name="billingContact"
                                 value={values.billingContact}
@@ -279,7 +308,35 @@ export default function EditOpticorder() {
                             />
                             {touched.billingContact && errors.billingContact && (
                                 <div className="text-xs text-red-500 mt-1">{errors.billingContact as string}</div>
+                            )} */}
+                            <label className="text-[#131927] font-medium text-sm">Billing Contact</label>
+
+                            <select
+                                name="billingContactId"
+                                value={values?.billingContactId}
+                                onChange={(e) => {
+                                    const selectedUser = users?.find((u: any) => u.id === e.target.value);
+                                    setFieldValue("billingContactId", selectedUser?.id || "");
+                                    setFieldValue("billingContact", selectedUser?.name || "");
+                                    setFieldValue("billingEmail", selectedUser?.email || "");
+                                }}
+                                className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm"
+                            >
+                                <option value="">Select Billing Contact</option>
+
+                                {users?.map((user: any) => (
+                                    <option key={user.id} value={user.id}>
+                                        {user.name} ({user.email})
+                                    </option>
+                                ))}
+                            </select>
+
+                            {touched.billingContact && errors.billingContact && (
+                                <div className="text-xs text-red-500 mt-1">
+                                    {errors.billingContact as string}
+                                </div>
                             )}
+
                         </div>
                     </div>
                 </div>
