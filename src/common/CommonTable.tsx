@@ -147,9 +147,9 @@ export default function CommonTable<TData>({
 
     return (
         <div className="bg-white rounded-xl border border-gray-200">
-            <div className="overflow-x-auto rounded-xl">
+            <div className="table-scroll overflow-x-auto rounded-xl max-h-[435px] overflow-y-auto">
                 <table className="min-w-full border-collapse text-sm">
-                    <thead className="bg-[#E5E7EA] text-[#262626]">
+                    <thead className="bg-[#E5E7EA] text-[#262626] sticky top-0 z-10">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <tr key={headerGroup.id}>
 
@@ -231,7 +231,7 @@ export default function CommonTable<TData>({
                                     </td>
                                 )}
 
-                                {row.getVisibleCells().map((cell) => {
+                                {/* {row.getVisibleCells().map((cell) => {
                                     const rawValue = flexRender(
                                         cell.column.columnDef.cell,
                                         cell.getContext()
@@ -243,6 +243,23 @@ export default function CommonTable<TData>({
                                             className="px-4 py-3 border-b text-[#4A5154] border-[#E5E7E8]"
                                         >
                                             {safeValue(rawValue)}
+                                        </td>
+                                    );
+                                })} */}
+                                {row.getVisibleCells().map((cell) => {
+                                    const value = cell.getValue();
+                                    console.log("🚀 ~ CommonTable ~ value:", value)
+
+                                    return (
+                                        <td
+                                            key={cell.id}
+                                            className="px-4 py-3 border-b text-[#4A5154] border-[#E5E7E8]"
+                                        >
+                                            {value === 'null' ? (
+                                                "-"
+                                            ) : (
+                                                flexRender(cell.column.columnDef.cell, cell.getContext())
+                                            )}
                                         </td>
                                     );
                                 })}

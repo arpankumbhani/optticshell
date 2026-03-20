@@ -110,7 +110,7 @@ export default function ModelDetails() {
         });
         setQtyValues(updated);
     };
-    if (isLoading) return <div className="p-4 text-center">Loading...</div>;
+    // if (isLoading) return <div className="p-4 text-center">Loading...</div>;
 
     return (
         <div className="p-4 ml-2">

@@ -40,7 +40,7 @@ const SignInPage: React.FC = () => {
           if (res?.status == "SUCCESS" && res?.code == 1) {
             const userData = res.data;
             login(userData);
-            navigate("/opticorders");
+            navigate("/view-opticorders");
           } else {
             console.error("Login failed: unexpected response", res);
           }
@@ -59,7 +59,7 @@ const SignInPage: React.FC = () => {
         <img
           src={signinPageImg}
           alt="Login"
-          className="w-3/4 h-auto object-contain rounded-lg"
+          className="h-auto rounded-lg w-xl"
         />
       </div>
 

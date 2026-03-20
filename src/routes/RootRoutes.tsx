@@ -24,7 +24,7 @@ export default function RootRoutes() {
                 <Route path="/signin" element={<SignInPage />} />
                 <Route element={<PrivateRoutes />}>
                     <Route element={<AdminLayout />}>
-                        <Route index element={<Dashboard />} />
+                        <Route index element={<ViewOpticOrders />} />
                         <Route path="/create-opticorders" element={<CreateOpticorder />} />
                         <Route path="/opticorders" element={<Opticorders />} />
                         <Route path="view-opticorders/:id" element={<ViewOpticorders />} />
@@ -39,8 +39,8 @@ export default function RootRoutes() {
 
 
                         <Route path="/umiyaplast" element={<Umiyaplast />} />
+                        <Route path="/" element={<ViewOpticOrders />} />
 
-                        <Route path="/" element={<Dashboard />} />
                     </Route>
                 </Route>
             </Routes>

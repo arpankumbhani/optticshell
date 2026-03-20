@@ -3,12 +3,15 @@ import type { AxiosResponse } from "./Axios";
 export interface Order {
   id: string;
   order_number: number;
+  order_name: string;
+  user_id: string;
   contact_name: string;
   main_category: string;
   sub_category: string;
   sub_customer_name: string;
   order_type: number;
   date_created: string;
+  order_date: string;
 }
 
 export interface OrdersListResponse {
@@ -122,4 +125,12 @@ export interface GeneratePdfResponse {
   data: {
     pdf_url: string;
   };
+}
+
+export interface DeletedOrderListParams {
+  page: number;
+  limit: number;
+  sort_by: string;
+  sort_order: "ASC" | "DESC";
+  search_text?: string | null;
 }

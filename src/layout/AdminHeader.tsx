@@ -73,8 +73,11 @@ const AdminHeader: React.FC = () => {
             {/* Profile */}
             <div className="relative">
               <button
-                onClick={() => setIsDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2 focus:outline-none"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDropdownOpen((prev) => !prev);
+                }}
+                className="flex items-center gap-2 focus:outline-none dropdown-toggle"
               >
                 <div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium uppercase">
                   {user?.profile_logo ? (

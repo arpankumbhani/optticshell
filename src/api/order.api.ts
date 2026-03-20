@@ -4,6 +4,7 @@ import type {
   OrderDetailsResponse,
   DeletedOrdersListResponse,
   GeneratePdfResponse,
+  DeletedOrderListParams,
 } from "../Types/Order.type";
 import { buildQueryString } from "../helper/buildQueryString";
 
@@ -14,14 +15,6 @@ export interface AdminOrderListParams {
   main_category: string | null;
   sub_category: string | null;
   category_type: number | null;
-  sort_by: string;
-  sort_order: "ASC" | "DESC";
-  search_text?: string | null;
-}
-
-export interface DeletedOrderListParams {
-  page: number;
-  limit: number;
   sort_by: string;
   sort_order: "ASC" | "DESC";
   search_text?: string | null;
