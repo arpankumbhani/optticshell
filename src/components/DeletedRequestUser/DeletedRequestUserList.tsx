@@ -3,11 +3,13 @@ import CommonTable from '../../common/CommonTable';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import UseToast from "../../hooks/useToast";
 import { approveDeleteRequestedUserAPI, rejectDeleteRequestedUserAPI } from '../../api/users.api';
+import type { ApiError } from '../../Types/Api.type';
+import type { DeletedRequestUserRow } from '../../pages/DeletedRequestUser/DeletedRequestUser';
 
 export default function DeletedRequestUserList({
     rows,
 }: {
-    rows: any[];
+    rows: DeletedRequestUserRow[];
 }) {
     const queryClient = useQueryClient();
     const approveMutation = useMutation({
@@ -16,9 +18,9 @@ export default function DeletedRequestUserList({
             UseToast(res?.message || "User approved successfully", "success");
             queryClient.invalidateQueries({ queryKey: ["getDeleteRequestedUsersAPI"] });
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error("Failed to approve user:", error);
-            UseToast(error?.message || "Failed to approve user", "error");
+            UseToast(error.message || "Failed to approve user", "error");
         }
     });
 
@@ -28,9 +30,9 @@ export default function DeletedRequestUserList({
             UseToast(res?.message || "User rejected successfully", "success");
             queryClient.invalidateQueries({ queryKey: ["getDeleteRequestedUsersAPI"] });
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error("Failed to reject user:", error);
-            UseToast(error?.message || "Failed to reject user", "error");
+            UseToast(error.message || "Failed to reject user", "error");
         }
     });
 
@@ -41,7 +43,7 @@ export default function DeletedRequestUserList({
         rejectMutation.mutate(id);
     };
 
-    const columns: CustomColumnDef<any>[] = [
+    const columns: CustomColumnDef<DeletedRequestUserRow>[] = [
         { accessorKey: "name", header: "NAME", sortable: false },
         { accessorKey: "email", header: "EMAIL", sortable: false },
         { accessorKey: "username", header: "USERNAME", sortable: false },

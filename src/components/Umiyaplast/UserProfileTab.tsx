@@ -8,6 +8,20 @@ import UserCircle from "../../assets/svg/user-circle.svg?react";
 import { getUserProfileAPI } from "../../api/users.api";
 import { useQuery } from "@tanstack/react-query";
 
+type UserProfileFormValues = {
+    fullName: string;
+    username: string;
+    email: string;
+    phone: string;
+    is_active: string;
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    gst_number: string;
+    photo: File | null;
+};
+
 export default function UserProfileTab() {
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -16,7 +30,10 @@ export default function UserProfileTab() {
         queryFn: getUserProfileAPI,
     });
 
-    const formik = useFormik({
+    const getTextValue = (value: UserProfileFormValues[keyof UserProfileFormValues]) =>
+        typeof value === "string" ? value : "";
+
+    const formik = useFormik<UserProfileFormValues>({
         initialValues: {
             fullName: "",
             username: "",
@@ -112,7 +129,7 @@ export default function UserProfileTab() {
                                     type="text"
                                     name={f.name}
                                     disabled
-                                    value={(formik.values as any)[f.name]}
+                                    value={getTextValue(formik.values[f.name as keyof UserProfileFormValues])}
                                     className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm cursor-not-allowed"
                                 />
                             </div>
@@ -146,7 +163,7 @@ export default function UserProfileTab() {
                                     type="text"
                                     name={field.name}
                                     disabled
-                                    value={(formik.values as any)[field.name]}
+                                    value={getTextValue(formik.values[field.name as keyof UserProfileFormValues])}
                                     className="mt-1 w-full border border-gray-200 bg-[#F9FAFB] rounded-md px-3 py-2 text-sm cursor-not-allowed"
                                 />
                             </div>

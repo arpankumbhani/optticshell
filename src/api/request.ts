@@ -1,10 +1,15 @@
-import axios from "axios";
-import type { AxiosResponse, ResponseType } from "axios";
+import axios, { AxiosError, AxiosHeaders } from "axios";
+import type {
+  AxiosRequestHeaders,
+  InternalAxiosRequestConfig,
+  ResponseType,
+} from "axios";
+import type { ApiError } from "../Types/Api.type";
 import { useAuthStore } from "../store/authStore";
 import UseToast from "../hooks/useToast";
 
 axios.interceptors.request.use(
-  function (config) {
+  function (config: InternalAxiosRequestConfig) {
     let authToken = useAuthStore.getState().token;
 
     useAuthStore.subscribe((state) => {
@@ -12,7 +17,7 @@ axios.interceptors.request.use(
     });
 
     if (!config.headers) {
-      config.headers = {} as any;
+      config.headers = new AxiosHeaders();
     }
 
     if (authToken) {
@@ -47,31 +52,30 @@ axios.interceptors.response.use(
 
     return Promise.reject(response);
   },
-  function (error) {
+  function (error: AxiosError<{ message?: string }>) {
     if (error?.response?.status === 400) {
-      // useAuthStore.getState().logout();
-      UseToast(error?.message, "error");
+      UseToast(error.message, "error");
     }
     if (error?.response?.status === 401 || error?.response?.status === 403) {
-      // useAuthStore.getState().logout();
-      UseToast(error?.message || "User No longer exist", "error");
+      UseToast(error.message || "User No longer exist", "error");
       window.location.href = "/signin";
     }
-
-    // if (error?.response?.status === 401) {
-    //   localStorage.removeItem("token");
-    // }
 
     const message =
       error.response?.status === 404
         ? "API not found."
-        : error?.response?.data?.message || "Something went wrong";
+        : error.response?.data?.message || "Something went wrong";
 
-    return Promise.reject(message);
+    return Promise.reject({ message } satisfies ApiError);
   }
 );
 
-export const request = async ({
+export const request = async <
+  TResponse,
+  TParams = Record<string, unknown>,
+  TBody = unknown,
+  THeaders extends AxiosRequestHeaders = AxiosRequestHeaders
+>({
   url,
   method = "GET",
   params,
@@ -81,21 +85,21 @@ export const request = async ({
 }: {
   url: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  params?: any;
-  body?: any;
-  headers?: any;
+  params?: TParams;
+  body?: TBody;
+  headers?: THeaders;
   responseType?: ResponseType;
-}) => {
+}): Promise<TResponse> => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-  const res: AxiosResponse = await axios.request({
+  const res = await axios.request<TResponse>({
     url: BASE_URL + url,
     method,
     params,
     data: body,
-    headers,
+    headers: headers as AxiosRequestHeaders | undefined,
     responseType,
   });
 
-  return res;
+  return res as TResponse;
 };

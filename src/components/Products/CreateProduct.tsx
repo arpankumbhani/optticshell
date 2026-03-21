@@ -5,6 +5,15 @@ import { createProductAPI } from "../../api/product.api";
 import UseToast from "../../hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import type { CreateProductColorInput } from "../../Types/Product.type";
+
+type CreateProductValues = {
+    name: string;
+    standard_quantity: string;
+    sku: string;
+    image: File | null;
+    product_colors: CreateProductColorInput[];
+};
 
 export default function CreateProduct() {
     const colorOptions = ["Met", "Shine", "R.Met", "NRB", "W/C", "R/B"];
@@ -28,7 +37,7 @@ export default function CreateProduct() {
         },
     });
 
-    const formik = useFormik({
+    const formik = useFormik<CreateProductValues>({
         initialValues: {
             name: "",
             standard_quantity: "",
@@ -62,7 +71,7 @@ export default function CreateProduct() {
             if (values.image instanceof File) {
                 formData.append("image", values.image);
             }
-            values.product_colors.forEach((m: any, index: number) => {
+            values.product_colors.forEach((m, index: number) => {
                 formData.append(`product_colors[${index}][name]`, m.name);
                 formData.append(`product_colors[${index}][price]`, m.price);
             });
@@ -168,10 +177,28 @@ export default function CreateProduct() {
                                 render={(arrayHelpers) => (
                                     <div className="rounded p-3 bg-[#F9FAFB]">
                                         {values.product_colors.map((item, index) => {
-                                            const colorError = touched.product_colors?.[index]?.name &&
-                                                errors.product_colors?.[index]?.name;
-                                            const priceError = touched.product_colors?.[index]?.price &&
-                                                errors.product_colors?.[index]?.price;
+                                            const colorTouched =
+                                                touched.product_colors?.[index] &&
+                                                typeof touched.product_colors[index] !== "boolean"
+                                                    ? touched.product_colors[index]?.name
+                                                    : false;
+                                            const priceTouched =
+                                                touched.product_colors?.[index] &&
+                                                typeof touched.product_colors[index] !== "boolean"
+                                                    ? touched.product_colors[index]?.price
+                                                    : false;
+                                            const colorError =
+                                                colorTouched &&
+                                                errors.product_colors?.[index] &&
+                                                typeof errors.product_colors[index] !== "string"
+                                                    ? errors.product_colors[index]?.name
+                                                    : undefined;
+                                            const priceError =
+                                                priceTouched &&
+                                                errors.product_colors?.[index] &&
+                                                typeof errors.product_colors[index] !== "string"
+                                                    ? errors.product_colors[index]?.price
+                                                    : undefined;
 
                                             return (
                                                 <div

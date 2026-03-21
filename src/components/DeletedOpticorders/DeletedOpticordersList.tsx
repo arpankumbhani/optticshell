@@ -1,11 +1,11 @@
 import type { DeletedOpticorderRow } from '../../Types/Order.type';
-import type { ColumnDef } from '@tanstack/react-table';
 import CommonTable, { type CustomColumnDef } from '../../common/CommonTable';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { recoverDeletedOrderAPI } from '../../api/order.api';
 import UseToast from '../../hooks/useToast';
 import { formatDate } from '../../helper/DateFormate';
 import { useNavigate } from 'react-router-dom';
+import type { ApiError } from '../../Types/Api.type';
 
 interface DeletedOpticordersListProps {
     rows: DeletedOpticorderRow[];
@@ -38,9 +38,9 @@ export default function DeletedOpticordersList({
             UseToast(res?.message || "Order Recovered successfully", "success");
             queryClient.invalidateQueries({ queryKey: ["getDeletedOrderListAPI"] });
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error("Recover failed:", error);
-            UseToast(error?.message || "Failed to recover", "error");
+            UseToast(error.message || "Failed to recover", "error");
         }
     });
     const handleRecover = (orderId: string) => {

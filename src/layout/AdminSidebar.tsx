@@ -6,9 +6,6 @@ import OpticOrders from "../assets/svg/new-tab.svg?react";
 import ViewOpticOrders from "../assets/svg/iris-scan.svg?react";
 import DeletedOrder from "../assets/svg/trash.svg?react";
 import UserIcon from "../assets/svg/user.svg?react";
-import FileIcon from "../assets/svg/file.svg?react";
-import NoteIcon from "../assets/svg/note.svg?react";
-import ListIcon from "../assets/svg/list.svg?react";
 import { Box, UserMinus } from "lucide-react";
 
 type NavItem = {

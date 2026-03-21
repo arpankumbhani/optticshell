@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { addDispatchDetailsAPI, getDispatchDetailsAPI } from "../../api/order.api";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -7,42 +7,57 @@ import * as Yup from "yup";
 import UseToast from "../../hooks/useToast";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import type { ApiError } from "../../Types/Api.type";
+import type {
+    AddDispatchDetailsPayload,
+    AddDispatchProductInput,
+    DispatchHistoryItem,
+    DispatchProduct,
+} from "../../Types/Order.type";
+
+type DispatchFormValues = {
+    dispatch_date: string;
+    challan_no: string;
+    total_parcel: string;
+    transport: string;
+    lr_no: string;
+};
 
 export default function ModelDetails() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const { data: dispatchData, isLoading } = useQuery({
+    const { data: dispatchData } = useQuery({
         queryKey: ["orderDetailsAPI", id],
         queryFn: () => getDispatchDetailsAPI(id!),
         enabled: !!id,
     });
 
     const addDispatchMutation = useMutation({
-        mutationFn: (payload: any) => addDispatchDetailsAPI(payload),
-        onSuccess: (res: any) => {
+        mutationFn: (payload: AddDispatchDetailsPayload) => addDispatchDetailsAPI(payload),
+        onSuccess: (res) => {
             UseToast(res?.message || "Dispatch details added successfully", "success");
             queryClient.invalidateQueries({ queryKey: ["orderDetailsAPI", id] });
             formik.resetForm();
         },
-        onError: (err: any) => {
+        onError: (err: ApiError) => {
             console.error("Update Error:", err);
-            UseToast(err?.message || "Failed to add dispatch details", "error");
+            UseToast(err.message || "Failed to add dispatch details", "error");
             formik.resetForm();
         },
     });
 
-    const products: any[] = dispatchData?.data?.products || [];
+    const products: DispatchProduct[] = dispatchData?.data?.products || [];
     const [qtyValues, setQtyValues] = useState<{ [key: string]: number }>({});
 
     // const totalDispatchAmount = Object.keys(qtyValues).reduce((sum, prodId) => {
-    //     const product = products.find((p: any) => p.id === prodId);
+    //     const product = products.find((p) => p.id === prodId);
     //     return sum + (qtyValues[prodId] || 0) * (product?.price || 0);
     // }, 0);
 
 
-    const formik = useFormik({
+    const formik = useFormik<DispatchFormValues>({
         initialValues: {
             dispatch_date: "",
             challan_no: "",
@@ -62,7 +77,7 @@ export default function ModelDetails() {
                 .map((prodId) => {
                     const qty = qtyValues[prodId];
                     if (qty <= 0) return null;
-                    const product = products.find((p: any) => p.id === prodId);
+                    const product = products.find((p) => p.id === prodId);
                     if (!product) return null;
                     if (qty > product.pen_qty) {
                         UseToast(`Quantity for ${product.name} exceeds pending quantity`, "warning");
@@ -73,17 +88,17 @@ export default function ModelDetails() {
                         dispatched_quantity: qty,
                     };
                 })
-                .filter(Boolean);
+                .filter((product): product is AddDispatchProductInput => product !== null);
 
             if (dispatchedProducts.length === 0) {
                 UseToast("Please enter at least one quantity", "warning");
                 return;
             }
             const payload = {
-                order_id: id,
+                order_id: id!,
                 dispatch_date: values.dispatch_date,
                 challan_no: values.challan_no,
-                total_parcel: dispatchedProducts.reduce((sum, p: any) => sum + p.dispatched_quantity, 0),
+                total_parcel: dispatchedProducts.reduce((sum, p) => sum + p.dispatched_quantity, 0),
                 transporter: values.transport,
                 lr_no: values.lr_no,
                 products: dispatchedProducts,
@@ -105,7 +120,7 @@ export default function ModelDetails() {
 
     const handleAddAllPending = () => {
         const updated: Record<string, number> = {};
-        products.forEach((p: any) => {
+        products.forEach((p) => {
             updated[p.id] = p.pen_qty || 0;
         });
         setQtyValues(updated);
@@ -141,7 +156,7 @@ export default function ModelDetails() {
                                 </tr>
                             </thead>
                             <tbody className="text-gray-700">
-                                {products.map((p: any) => {
+                                {products.map((p) => {
                                     const currentQty = qtyValues[p.id] || 0;
                                     const currentAmount = currentQty * p.price;
                                     const dispatchCount = p.dispatch_details?.length || 0;
@@ -176,7 +191,7 @@ export default function ModelDetails() {
                                     }
 
                                     // Case 2: Has dispatch history → show multiple rows
-                                    return p.dispatch_details.map((d: any, idx: number) => {
+                                    return p.dispatch_details.map((d: DispatchHistoryItem, idx: number) => {
                                         const isLast = idx === dispatchCount - 1;
                                         const borderClass = isLast ? "group border-b border-gray-300" : "";
 

@@ -2,19 +2,27 @@ import { useQuery } from "@tanstack/react-query";
 import { getDeleteRequestedUsersAPI } from "../../api/users.api";
 import DeletedRequestUserList from "../../components/DeletedRequestUser/DeletedRequestUserList";
 import { useMemo } from "react";
+import type { DeleteRequestedUser } from "../../Types/User.type";
+
+export interface DeletedRequestUserRow {
+    id: string;
+    name: string;
+    email: string;
+    username: string;
+}
 
 export default function DeletedRequestUser() {
 
 
-    const { data, isLoading, isError } = useQuery<any>({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ["getDeleteRequestedUsersAPI",],
         queryFn: () => getDeleteRequestedUsersAPI(),
-        placeholderData: (prev: any) => prev,
+        placeholderData: (prev) => prev,
     });
 
 
-    const rows: any[] = useMemo(() => {
-        return (data?.data ?? []).map((o: any) => ({
+    const rows: DeletedRequestUserRow[] = useMemo(() => {
+        return (data?.data ?? []).map((o: DeleteRequestedUser) => ({
             id: o.id,
             name: String(o.name),
             email: o.email,

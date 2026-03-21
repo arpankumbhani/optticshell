@@ -2,6 +2,17 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { productColorReportAPI } from "../../api/product.api";
 import ProductsList from "../../components/Products/ProductsList";
+import type { ProductColorReportItem } from "../../Types/Product.type";
+
+export interface ProductReportRow {
+    id: string;
+    name: string;
+    color_name: string;
+    total_amount: number;
+    total_quantity: number;
+    dispatch_quantity: number;
+    pending_quantity: number;
+}
 
 export default function Products() {
     const [pageIndex, setPageIndex] = useState(1);
@@ -18,17 +29,17 @@ export default function Products() {
         search_text: "",
     }), [pageIndex, sortBy, sortOrder]);
 
-    const { data, isLoading, isError } = useQuery<any>({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ["productColorReportAPI", params],
         queryFn: () => productColorReportAPI(params),
-        placeholderData: (prev: any) => prev,
+        placeholderData: (prev) => prev,
     });
 
     const total = data?.data?.total ?? 0;
     const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
-    const rows: any[] = useMemo(() => {
-        return (data?.data?.items ?? []).map((o: any) => ({
+    const rows: ProductReportRow[] = useMemo(() => {
+        return (data?.data?.items ?? []).map((o: ProductColorReportItem) => ({
             id: o.product_id,
             name: o.product_name,
             color_name: o.color_name,

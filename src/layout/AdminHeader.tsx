@@ -9,17 +9,12 @@ import { logoutAPI } from "../api/auth.api";
 
 const AdminHeader: React.FC = () => {
   const { user, logout } = useAuthStore();
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebarStore();
+  useSidebarStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleToggle = () => {
-    if (window.innerWidth >= 1024) toggleSidebar();
-    else toggleMobileSidebar();
-  };
-
-  const { mutate: logoutUser, isPending } = useMutation({
+  const { mutate: logoutUser } = useMutation({
     mutationFn: logoutAPI,
     onSuccess: () => {
       logout();

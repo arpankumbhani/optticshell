@@ -1,4 +1,4 @@
-export const convertFileToBase64 = (file: any): Promise<string> => {
+export const convertFileToBase64 = (file: File | null | undefined): Promise<string> => {
   return new Promise((resolve, reject) => {
     if (!file || !(file instanceof File)) {
       resolve("");

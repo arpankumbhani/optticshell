@@ -1,10 +1,15 @@
 import { request } from "./request";
 import type {
+  AddDispatchDetailsPayload,
+  BulkDeleteOrdersPayload,
+  DeletedOrderDetailsResponse,
+  DispatchDetailsResponse,
   OrdersListResponse,
   OrderDetailsResponse,
   DeletedOrdersListResponse,
   GeneratePdfResponse,
   DeletedOrderListParams,
+  OrderMutationResponse,
 } from "../Types/Order.type";
 import { buildQueryString } from "../helper/buildQueryString";
 
@@ -36,23 +41,23 @@ export const getAdminOrderListAPI = async (
   });
   const url = `order/adminOrderList${queryString}`;
 
-  const response = await request({
+  const response = await request<OrdersListResponse>({
     url,
     method: "GET",
   });
 
-  return response as unknown as OrdersListResponse;
+  return response;
 };
 
 export const getOrderDetailsAPI = async (
   id: string
 ): Promise<OrderDetailsResponse> => {
-  const response = await request({
+  const response = await request<OrderDetailsResponse>({
     url: `order/getOrderDetails/${id}`,
     method: "GET",
   });
 
-  return response as unknown as OrderDetailsResponse;
+  return response;
 };
 
 export const getDeletedOrderListAPI = async (
@@ -67,38 +72,40 @@ export const getDeletedOrderListAPI = async (
   });
   const url = `order/deletedOrderList${queryString}`;
 
-  const response = await request({
+  const response = await request<DeletedOrdersListResponse>({
     url,
     method: "GET",
   });
 
-  return response as unknown as DeletedOrdersListResponse;
+  return response;
 };
 
 export const recoverDeletedOrderAPI = async (
   id: string
 ): Promise<OrderDetailsResponse> => {
-  const response = await request({
+  const response = await request<OrderDetailsResponse>({
     url: `order/recoverDeletedOrder/${id}`,
     method: "PUT",
   });
 
-  return response as unknown as OrderDetailsResponse;
+  return response;
 };
 
 export const generatePdfAPI = async (
   id: string
 ): Promise<GeneratePdfResponse> => {
-  const response = await request({
+  const response = await request<GeneratePdfResponse>({
     url: `order/generateOrderPdf/${id}`,
     method: "GET",
   });
 
-  return response as unknown as GeneratePdfResponse;
+  return response;
 };
 
-export const createAdminOrderAPI = async (payload: any): Promise<any> => {
-  const response = await request({
+export const createAdminOrderAPI = async (
+  payload: FormData
+): Promise<OrderMutationResponse> => {
+  const response = await request<OrderMutationResponse, undefined, FormData>({
     url: `order/createAdminOrder`,
     method: "POST",
     body: payload,
@@ -107,8 +114,10 @@ export const createAdminOrderAPI = async (payload: any): Promise<any> => {
   return response;
 };
 
-export const bulkDeleteOrdersAPI = async (payload: any): Promise<any> => {
-  const response = await request({
+export const bulkDeleteOrdersAPI = async (
+  payload: BulkDeleteOrdersPayload
+): Promise<OrderMutationResponse> => {
+  const response = await request<OrderMutationResponse, undefined, BulkDeleteOrdersPayload>({
     url: `order/bulkDeleteOrders`,
     method: "POST",
     body: payload,
@@ -119,9 +128,9 @@ export const bulkDeleteOrdersAPI = async (payload: any): Promise<any> => {
 
 export const updateAdminOrderAPI = async (
   id: string,
-  payload: any
-): Promise<any> => {
-  const response = await request({
+  payload: FormData
+): Promise<OrderMutationResponse> => {
+  const response = await request<OrderMutationResponse, undefined, FormData>({
     url: `order/updateAdminOrder/${id}`,
     method: "PUT",
     body: payload,
@@ -130,8 +139,10 @@ export const updateAdminOrderAPI = async (
   return response;
 };
 
-export const getDispatchDetailsAPI = async (id: string): Promise<any> => {
-  const response = await request({
+export const getDispatchDetailsAPI = async (
+  id: string
+): Promise<DispatchDetailsResponse> => {
+  const response = await request<DispatchDetailsResponse>({
     url: `order/getDispatchDetails/${id}`,
     method: "GET",
   });
@@ -139,8 +150,10 @@ export const getDispatchDetailsAPI = async (id: string): Promise<any> => {
   return response;
 };
 
-export const addDispatchDetailsAPI = async (payload: any): Promise<any> => {
-  const response = await request({
+export const addDispatchDetailsAPI = async (
+  payload: AddDispatchDetailsPayload
+): Promise<OrderMutationResponse> => {
+  const response = await request<OrderMutationResponse, undefined, AddDispatchDetailsPayload>({
     url: `order/addDispatchDetails`,
     method: "POST",
     body: payload,
@@ -149,8 +162,10 @@ export const addDispatchDetailsAPI = async (payload: any): Promise<any> => {
   return response;
 };
 
-export const getDeletedOrderDetailsAPI = async (id: string): Promise<any> => {
-  const response = await request({
+export const getDeletedOrderDetailsAPI = async (
+  id: string
+): Promise<DeletedOrderDetailsResponse> => {
+  const response = await request<DeletedOrderDetailsResponse>({
     url: `order/getDeletedOrderDetails/${id}`,
     method: "GET",
   });

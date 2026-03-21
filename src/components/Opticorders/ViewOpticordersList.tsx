@@ -6,6 +6,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import UseToast from "../../hooks/useToast";
 import { bulkDeleteOrdersAPI, generatePdfAPI } from "../../api/order.api";
 import { useState } from "react";
+import type { ApiError } from "../../Types/Api.type";
+import type { BulkDeleteOrdersPayload } from "../../Types/Order.type";
 
 interface OpticordersListProps {
     rows: OpticorderRow[];
@@ -32,8 +34,7 @@ export default function ViewOpticordersList({
     onSortChange,
 }: OpticordersListProps) {
     const navigate = useNavigate();
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
-    console.log("🚀 ~ ViewOpticordersList ~ selectedIds:", selectedIds)
+    const [, setSelectedIds] = useState<string[]>([]);
 
     const handleViewOrder = (id: string) => {
         navigate(`/view-opticorders/${id}`);
@@ -56,21 +57,21 @@ export default function ViewOpticordersList({
                 queryClient.invalidateQueries({ queryKey: ["getAdminOrderListAPI"] });
             }
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error("Failed to generate PDF:", error);
-            UseToast(error?.message || "Failed to generate PDF", "error");
+            UseToast(error.message || "Failed to generate PDF", "error");
         }
     });
 
     const bulkDeleteOrdersMutation = useMutation({
-        mutationFn: (payload: any) => bulkDeleteOrdersAPI(payload),
+        mutationFn: (payload: BulkDeleteOrdersPayload) => bulkDeleteOrdersAPI(payload),
         onSuccess: (res) => {
             UseToast(res?.message || "Orders deleted successfully", "success");
             queryClient.invalidateQueries({ queryKey: ["getAdminOrderListAPI"] });
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error("Failed to delete orders:", error);
-            UseToast(error?.message || "Failed to delete orders", "error");
+            UseToast(error.message || "Failed to delete orders", "error");
         }
     });
 
@@ -81,7 +82,7 @@ export default function ViewOpticordersList({
 
 
     const handleDeleteSelected = (ids: string[]) => {
-        const payload: any = {
+        const payload: BulkDeleteOrdersPayload = {
             order_ids: ids
         }
         bulkDeleteOrdersMutation.mutate(payload);

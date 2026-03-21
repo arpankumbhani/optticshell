@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+    type CellContext,
     flexRender,
     getCoreRowModel,
     getPaginationRowModel,
@@ -40,6 +41,10 @@ export const SortIcon = ({
 
 export type CustomColumnDef<TData> = ColumnDef<TData> & {
     sortable?: boolean;
+};
+
+type RowWithId = {
+    id: string;
 };
 
 interface CommonTableProps<TData> {
@@ -94,7 +99,7 @@ export default function CommonTable<TData>({
 
     /** Detect if sorting is enabled */
     const sortingEnabled = typeof onSortChange === "function";
-    const [rowSelection, setRowSelection] = useState({});
+    const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
 
@@ -118,7 +123,7 @@ export default function CommonTable<TData>({
         const selectedRows = table
             .getSelectedRowModel()
             .flatRows.map((row) =>
-                idAccessor ? idAccessor(row.original) : (row.original as any).id
+                idAccessor ? idAccessor(row.original) : (row.original as RowWithId).id
             );
 
         onSelectionChange(selectedRows);
@@ -140,8 +145,8 @@ export default function CommonTable<TData>({
     const visiblePages =
         paginationEnabled ? Array.from({ length: pageCount! }, (_, i) => i + 1) : [];
 
-    const safeValue = (value: any) => {
-        return value == null || value === undefined || value === "" ? "-" : value;
+    const safeValue = (value: React.ReactNode): React.ReactNode => {
+        return value == null || value === "" ? "-" : value;
     };
 
 
@@ -183,7 +188,7 @@ export default function CommonTable<TData>({
 
                                 {headerGroup.headers.map((header) => {
                                     const colId = header.column.id;
-                                    const col = header.column.columnDef as CustomColumnDef<any>;
+                                    const col = header.column.columnDef as CustomColumnDef<TData>;
                                     const isSortable = sortingEnabled && col.sortable;
 
                                     return (
@@ -248,18 +253,20 @@ export default function CommonTable<TData>({
                                 })} */}
                                 {row.getVisibleCells().map((cell) => {
                                     const value = cell.getValue();
-                                    console.log("🚀 ~ CommonTable ~ value:", value)
 
                                     return (
                                         <td
                                             key={cell.id}
                                             className="px-4 py-3 border-b text-[#4A5154] border-[#E5E7E8]"
                                         >
-                                            {value === 'null' ? (
-                                                "-"
-                                            ) : (
-                                                flexRender(cell.column.columnDef.cell, cell.getContext())
-                                            )}
+                                            {value === "null"
+                                                ? "-"
+                                                : safeValue(
+                                                    flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext() as CellContext<TData, unknown>
+                                                    )
+                                                )}
                                         </td>
                                     );
                                 })}

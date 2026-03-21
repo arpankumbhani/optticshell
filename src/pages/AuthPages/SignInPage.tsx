@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { loginAPI } from "../../api/auth.api";
 import { useAuthStore } from "../../store/authStore";
+import type { ApiError } from "../../Types/Api.type";
 
 const SignInPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +46,7 @@ const SignInPage: React.FC = () => {
             console.error("Login failed: unexpected response", res);
           }
         },
-        onError: (err: any) => {
+        onError: (err: ApiError) => {
           console.error("Login failed:", err);
         },
       });
@@ -131,7 +132,7 @@ const SignInPage: React.FC = () => {
             </div>
             {isError && (
               <p className="text-red-500 text-xs mt-2">
-                {(error as any)?.response?.data?.message || "Login failed"}
+                {(error as ApiError)?.message || "Login failed"}
               </p>
             )}
             <button

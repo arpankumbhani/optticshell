@@ -1,4 +1,11 @@
-import type { AxiosResponse } from "./Axios";
+import type { ApiMessageResponse, ApiResponse } from "./Api.type";
+
+export interface OrderModifyDetail {
+  modify_by: string;
+  modify_date: string;
+  modify_qty: number;
+  prev_qty: number;
+}
 
 export interface Order {
   id: string;
@@ -10,6 +17,7 @@ export interface Order {
   sub_category: string;
   sub_customer_name: string;
   order_type: number;
+  is_edited: boolean;
   date_created: string;
   order_date: string;
 }
@@ -28,11 +36,25 @@ export interface OrderModel {
   id: string;
   name: string;
   color_name: string;
+  product_id?: string;
+  product_color_id?: string;
   qty: number;
   price: number;
   remark: string;
   total_price: number;
-  modify_details: any[];
+  modify_details: OrderModifyDetail[];
+}
+
+export interface DeletedOrderModel {
+  id: string;
+  product_id: string;
+  product_color_id: string;
+  name: string;
+  color_name: string;
+  quantity: number;
+  price: number;
+  remark: string;
+  total_price: number;
 }
 
 export interface OrderDetailsData {
@@ -62,7 +84,29 @@ export interface OrderDetailsData {
   order_models: OrderModel[];
 }
 
-export type OrderDetailsResponse = AxiosResponse<OrderDetailsData>;
+export type OrderDetailsResponse = ApiResponse<OrderDetailsData>;
+
+export interface DeletedOrderDetailsData {
+  id: string;
+  order_number: number;
+  name: string;
+  billing_contact: string;
+  billing_email: string;
+  main_category: string;
+  sub_category: string;
+  sub_customer_name: string;
+  sub_customer_detail: string;
+  order_remark: string;
+  total_pending_price: number;
+  total_pending_qty: number;
+  total_dispatch_price: number;
+  total_dispatch_qty: number;
+  total_price: number;
+  total_qty: number;
+  order_models: DeletedOrderModel[];
+}
+
+export type DeletedOrderDetailsResponse = ApiResponse<DeletedOrderDetailsData>;
 
 export interface AdminOrderListParams {
   page: number;
@@ -126,6 +170,51 @@ export interface GeneratePdfResponse {
     pdf_url: string;
   };
 }
+
+export interface BulkDeleteOrdersPayload {
+  order_ids: string[];
+}
+
+export interface DispatchHistoryItem {
+  dis_qty: number;
+  dis_date: string;
+  challan: string;
+  total_parcel: number;
+  transport: string;
+  lr_no: string;
+}
+
+export interface DispatchProduct {
+  id: string;
+  name: string;
+  color: string;
+  price: number;
+  pen_qty: number;
+  dis_qty: number;
+  dispatch_details: DispatchHistoryItem[];
+}
+
+export type DispatchDetailsResponse = ApiResponse<{
+  products: DispatchProduct[];
+  count: number;
+}>;
+
+export interface AddDispatchProductInput {
+  order_product_id: string;
+  dispatched_quantity: number;
+}
+
+export interface AddDispatchDetailsPayload {
+  order_id: string;
+  dispatch_date: string;
+  challan_no: string;
+  total_parcel: number;
+  transporter: string;
+  lr_no: string;
+  products: AddDispatchProductInput[];
+}
+
+export type OrderMutationResponse = ApiMessageResponse;
 
 export interface DeletedOrderListParams {
   page: number;

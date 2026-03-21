@@ -8,12 +8,43 @@ import UseToast from "../../hooks/useToast";
 import { useNavigate, useParams } from "react-router-dom";
 import { getUsersForOrderDropdown } from "../../api/users.api";
 import { ChevronLeft } from "lucide-react";
+import type { ApiError } from "../../Types/Api.type";
+import type { OrderModel } from "../../Types/Order.type";
+import type { ProductListItem } from "../../Types/Product.type";
+import type { UserDropdownItem } from "../../Types/User.type";
 
-type ProductColor = { id: string; color_name: string; price: number };
-type Product = {
-    id: string;
-    name: string;
-    productColors: ProductColor[];
+type OrderFormModel = {
+    _id?: string;
+    productId: string;
+    colorId: string;
+    qty: number;
+    price: number;
+    remark: string;
+    total: number;
+};
+type OrderFormValues = {
+    orderNo: string;
+    status: string;
+    billingContact: string;
+    billingContactId: string;
+    mainCategory: string;
+    subCategory: string;
+    orderType: string;
+    subCustomerDetail: string;
+    subCustomerName: string;
+    orderRemark: string;
+    orderImage: File | null;
+    models: OrderFormModel[];
+};
+
+const emptyOrderModel: OrderFormModel = {
+    _id: undefined,
+    productId: "",
+    colorId: "",
+    qty: 0,
+    price: 0,
+    remark: "",
+    total: 0,
 };
 
 const mapCategoryType = (mainCategory: string, subCategory?: string) => {
@@ -29,7 +60,7 @@ export default function EditOpticorder() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const { data: orderResp, isLoading: orderLoading } = useQuery({
+    const { data: orderResp } = useQuery({
         queryKey: ["orderDetailsAPI", id],
         queryFn: () => getOrderDetailsAPI(id!),
         enabled: !!id,
@@ -40,22 +71,19 @@ export default function EditOpticorder() {
         queryKey: ["usersForOrderDropdown"],
         queryFn: () => getUsersForOrderDropdown(),
     });
-    const users = usersResp?.data || null;
-
-    console.log("🚀 ~ EditOpticorder ~ usersResp:", users)
-
+    const users: UserDropdownItem[] = usersResp?.data || [];
 
     const updateMutation = useMutation({
-        mutationFn: (payload: any) => updateAdminOrderAPI(id!, payload),
-        onSuccess: (res: any) => {
+        mutationFn: (payload: FormData) => updateAdminOrderAPI(id!, payload),
+        onSuccess: (res) => {
             UseToast(res?.message || "Order updated successfully", "success");
             queryClient.invalidateQueries({ queryKey: ["ordersList"] });
             queryClient.invalidateQueries({ queryKey: ["orderDetailsAPI", id] });
             navigate("/opticorders");
         },
-        onError: (err: any) => {
+        onError: (err: ApiError) => {
             console.error("Update Error:", err);
-            UseToast(err?.message || "Failed to update order", "error");
+            UseToast(err.message || "Failed to update order", "error");
         },
     });
 
@@ -82,7 +110,7 @@ export default function EditOpticorder() {
             orderRemark: order?.order_remark ?? "",
             orderImage: null as File | null,
             models:
-                (order?.order_models || []).map((m: any) => ({
+                (order?.order_models || []).map((m: OrderModel) => ({
                     _id: m.id,
                     productId: m.product_id || "",
                     colorId: m.product_color_id || "",
@@ -90,21 +118,11 @@ export default function EditOpticorder() {
                     price: Number(m.price || 0),
                     remark: m.remark || "",
                     total: Number(m.total_price ?? m.qty * m.price),
-                })) || [
-                    {
-                        _id: undefined,
-                        productId: "",
-                        colorId: "",
-                        qty: 0,
-                        price: 0,
-                        remark: "",
-                        total: 0,
-                    },
-                ],
+                })) || [emptyOrderModel],
         };
     }, [order]);
 
-    const formik = useFormik({
+    const formik = useFormik<OrderFormValues>({
         initialValues: initialValues,
         enableReinitialize: true,
         validationSchema: Yup.object().shape({
@@ -139,12 +157,12 @@ export default function EditOpticorder() {
 
         onSubmit: async (values) => {
             try {
-                const category_type: any =
+                const category_type =
                     values.mainCategory === "1" ? 1 : Number(values.subCategory);
                 const formData = new FormData();
                 formData.append("user_id", values.billingContactId);
                 formData.append("order_status", values.status);
-                formData.append("category_type", category_type);
+                formData.append("category_type", String(category_type));
                 formData.append("order_type", values.orderType);
                 formData.append("sub_customer_name", values.subCustomerName || "");
                 formData.append("sub_customer_detail", values.subCustomerDetail || "");
@@ -152,11 +170,11 @@ export default function EditOpticorder() {
                 if (values.orderImage instanceof File) {
                     formData.append("order_image", values.orderImage);
                 }
-                values.models.forEach((m: any, index: number) => {
+                values.models.forEach((m, index: number) => {
                     formData.append(`order_models[${index}][product_id]`, m.productId);
                     formData.append(`order_models[${index}][product_color_id]`, m.colorId);
-                    formData.append(`order_models[${index}][quantity]`, m.qty);
-                    formData.append(`order_models[${index}][price]`, m.price);
+                    formData.append(`order_models[${index}][quantity]`, String(m.qty));
+                    formData.append(`order_models[${index}][price]`, String(m.price));
                     formData.append(`order_models[${index}][remark]`, m.remark || "");
                 });
                 updateMutation.mutate(formData);
@@ -177,11 +195,11 @@ export default function EditOpticorder() {
         queryFn: () => getProductListAPI({ category_type: currentCategoryType }),
         enabled: !!currentCategoryType,
     });
-    const products: Product[] = productResp?.data?.productList || [];
+    const products: ProductListItem[] = productResp?.data?.productList || [];
     const findProduct = (id?: string) => products.find((p) => p.id === id);
 
     useEffect(() => {
-        values.models.forEach((m: any, idx: number) => {
+        values.models.forEach((m, idx: number) => {
             if (m.productId && m.colorId) {
                 const prod = findProduct(m.productId);
                 const color = prod?.productColors?.find((c) => c.id === m.colorId);
@@ -197,8 +215,13 @@ export default function EditOpticorder() {
         });
     }, [products]);
 
-    const onModelChange = (index: number, field: string, value: any) => {
+    const onModelChange = (
+        index: number,
+        field: keyof OrderFormModel,
+        value: string | number
+    ) => {
         setFieldValue(`models[${index}].${field}`, value);
+        const currentModel = values.models[index];
 
         if (field === "productId") {
             setFieldValue(`models[${index}].colorId`, "");
@@ -208,17 +231,16 @@ export default function EditOpticorder() {
             return;
         }
         if (field === "colorId") {
-            const productId = (values.models[index] as any).productId;
-            const prod = findProduct(productId);
+            const prod = findProduct(currentModel.productId);
             const color = prod?.productColors.find((c) => c.id === value);
             const price = color?.price ?? 0;
             setFieldValue(`models[${index}].price`, price);
-            const qty = Number((values.models[index] as any).qty || 0);
+            const qty = Number(currentModel.qty || 0);
             setFieldValue(`models[${index}].total`, qty * price);
             return;
         }
         if (field === "qty") {
-            const price = Number((values.models[index] as any).price || 0);
+            const price = Number(currentModel.price || 0);
             const qty = Number(value || 0);
             setFieldValue(`models[${index}].total`, qty * price);
             return;
@@ -226,8 +248,8 @@ export default function EditOpticorder() {
     };
 
     const totals = useMemo(() => {
-        const totalPrice = values.models.reduce((s: number, m: any) => s + Number(m.total || 0), 0);
-        const totalQty = values.models.reduce((s: number, m: any) => s + Number(m.qty || 0), 0);
+        const totalPrice = values.models.reduce((s: number, m) => s + Number(m.total || 0), 0);
+        const totalQty = values.models.reduce((s: number, m) => s + Number(m.qty || 0), 0);
         return { totalPendingPrice: totalPrice, totalPrice, totalPendingQty: totalQty, totalQty };
     }, [values.models]);
 
@@ -289,7 +311,7 @@ export default function EditOpticorder() {
                                     name="billingContactId"
                                     value={values?.billingContactId}
                                     onChange={(e) => {
-                                        const selectedUser = users?.find((u: any) => u.id === e.target.value);
+                                        const selectedUser = users.find((u) => u.id === e.target.value);
                                         setFieldValue("billingContactId", selectedUser?.id || "");
                                         setFieldValue("billingContact", selectedUser?.name || "");
                                         setFieldValue("billingEmail", selectedUser?.email || "");
@@ -298,7 +320,7 @@ export default function EditOpticorder() {
                                 >
                                     <option value="">Select Billing Contact</option>
 
-                                    {users?.map((user: any) => (
+                                    {users.map((user) => (
                                         <option key={user.id} value={user.id}>
                                             {user.name} ({user.email})
                                         </option>
@@ -457,7 +479,7 @@ export default function EditOpticorder() {
                                 name="models"
                                 render={(arrayHelpers) => (
                                     <div className="rounded p-3 bg-[#F9FAFB]">
-                                        {(values.models || []).map((model: any, idx: number) => (
+                                        {(values.models || []).map((model, idx: number) => (
                                             <div key={idx} className="mb-4">
                                                 <div className="grid grid-cols-13 gap-3 items-end">
                                                     <div className="col-span-3">
@@ -564,14 +586,7 @@ export default function EditOpticorder() {
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    arrayHelpers.push({
-                                                        productId: "",
-                                                        colorId: "",
-                                                        qty: 0,
-                                                        price: 0,
-                                                        remark: "",
-                                                        total: 0,
-                                                    })
+                                                    arrayHelpers.push({ ...emptyOrderModel })
                                                 }
                                                 className="px-3 py-1 text-sm border rounded bg-blue-50 cursor-pointer text-blue-600"
                                             >

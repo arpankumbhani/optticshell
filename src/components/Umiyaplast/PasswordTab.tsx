@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { resetPasswordAPI } from "../../api/users.api";
 import { useMutation } from "@tanstack/react-query";
 import UseToast from "../../hooks/useToast";
 import { Eye, EyeOff } from "lucide-react";
+import type { ApiError } from "../../Types/Api.type";
 
 export default function PasswordTab() {
 
@@ -50,12 +51,12 @@ export default function PasswordTab() {
             };
 
             mutateResetPassword(payload, {
-                onSuccess: (res: any) => {
+                onSuccess: (res) => {
                     resetForm();
                     UseToast(res?.message || "Password updated successfully", "success");
                 },
-                onError: (error: any) => {
-                    UseToast(error?.message || "Failed to update password", "error");
+                onError: (error: ApiError) => {
+                    UseToast(error.message || "Failed to update password", "error");
                 },
             });
         },

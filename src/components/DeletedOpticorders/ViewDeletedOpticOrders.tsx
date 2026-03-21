@@ -3,12 +3,13 @@ import { getDeletedOrderDetailsAPI } from '../../api/order.api';
 import { useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import type { DeletedOrderModel } from '../../Types/Order.type';
 
 export default function ViewDeletedOpticOrders() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    const { data, isLoading, isError, error } = useQuery({
+    const { data, isError, error } = useQuery({
         queryKey: ["getDeletedOrderDetailsAPI"],
         queryFn: () => getDeletedOrderDetailsAPI(id!),
         enabled: !!id,
@@ -224,11 +225,11 @@ export default function ViewDeletedOpticOrders() {
                             </thead>
 
                             <tbody className="divide-y divide-gray-100 text-gray-700">
-                                {deletedOrderDetails.order_models.map((item: any) => (
+                                {deletedOrderDetails.order_models.map((item: DeletedOrderModel) => (
                                     <tr key={item.id}>
                                         <td className="px-6 py-3">{item.name}</td>
                                         <td className="px-6 py-3">{item.color_name}</td>
-                                        <td className="px-6 py-3">{item.qty}</td>
+                                        <td className="px-6 py-3">{item.quantity}</td>
                                         <td className="px-6 py-3">{item.price}</td>
                                         <td className="px-6 py-3">{item.remark || "-"}</td>
                                         <td className="px-6 py-3">{item.total_price}</td>

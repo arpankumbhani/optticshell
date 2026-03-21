@@ -1,17 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { AuthUser } from "../Types/Auth.type";
 // import { logoutUser } from "../api/auth.api";
-
-interface AuthUser {
-  id: string;
-  username: string;
-  name: string;
-  email: string;
-  user_type: number;
-  profile_logo?: string;
-  auth_token: string;
-  refresh_token: string;
-}
 
 interface AuthState {
   user: AuthUser | null;

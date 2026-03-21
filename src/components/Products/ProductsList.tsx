@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import CommonTable, { type CustomColumnDef } from "../../common/CommonTable";
-import { formatDate } from "../../helper/DateFormate";
+import type { ProductReportRow } from "../../pages/Products/Products";
 
 interface ProductsListProps {
-    rows: any[];
+    rows: ProductReportRow[];
     pageIndex: number;
     pageSize: number;
     totalEntries: number;
@@ -30,7 +30,7 @@ export default function ProductsList({
 
 
 
-    const columns: CustomColumnDef<any>[] = [
+    const columns: CustomColumnDef<ProductReportRow>[] = [
         { accessorKey: "name", header: "PRODUCT NAME", sortable: true },
         { accessorKey: "color_name", header: "COLOR NAME", sortable: true },
         { accessorKey: "total_amount", header: "TOTAL AMOUNT", sortable: true },

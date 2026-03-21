@@ -6,6 +6,7 @@ import type { OrderModel, OrderDetailsResponse } from "../../Types/Order.type";
 import UseToast from "../../hooks/useToast";
 import { FileText, Pencil, Printer } from "lucide-react";
 import { formatDateTime } from "../../helper/DateFormate";
+import type { ApiError } from "../../Types/Api.type";
 
 export default function ViewOpticorders() {
     const { id } = useParams<{ id: string }>();
@@ -33,9 +34,9 @@ export default function ViewOpticorders() {
                 queryClient.invalidateQueries({ queryKey: ["getOpticorderListAPI"] });
             }
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             console.error("Failed to generate PDF:", error);
-            UseToast(error?.message || "Failed to generate PDF", "error");
+            UseToast(error.message || "Failed to generate PDF", "error");
         }
     });
 
@@ -254,7 +255,7 @@ export default function ViewOpticorders() {
                                 </label>
                                 <input
                                     type="text"
-                                    value="0"
+                                    value={order?.total_dispatch_qty}
                                     disabled
                                     className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
                                 />
@@ -263,7 +264,7 @@ export default function ViewOpticorders() {
                                 <label className="text-[#131927] font-medium text-sm mb-1">Total Price</label>
                                 <input
                                     type="text"
-                                    value="23040"
+                                    value={order?.total_price}
                                     disabled
                                     className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
                                 />
@@ -272,7 +273,7 @@ export default function ViewOpticorders() {
                                 <label className="text-[#131927] font-medium text-sm mb-1">Total Qty</label>
                                 <input
                                     type="text"
-                                    value="1920"
+                                    value={order?.total_qty}
                                     disabled
                                     className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50"
                                 />

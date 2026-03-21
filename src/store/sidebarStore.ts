@@ -17,7 +17,7 @@ type SidebarState = {
   setIsMobileOpen: (isOpen: boolean) => void;
 };
 
-export const useSidebarStore = create<SidebarState>((set, get) => ({
+export const useSidebarStore = create<SidebarState>((set) => ({
   isExpanded: true,
   isMobileOpen: false,
   isHovered: false,
